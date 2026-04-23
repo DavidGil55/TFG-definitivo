@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bomb Party - Lobby</title>
+    <link rel="stylesheet" href="../CSS/estiloIndex.css">
+</head>
+
+<body>
+    <div class="divPrincipal">
+        <header class="header">
+            <div class="divGenerico cajaConContenido nombreProyecto">
+                BOMB PARTY - TFG
+            </div>
+        </header>
+
+        <main class="zonaSeleccion">
+            <div class="seleccionFila">
+                <button id="botonCrear" onclick="crearSala()" class="divGenerico cajaConContenido botonDesactivado"
+                    disabled>
+                    CREAR SALA
+                </button>
+                <button id="botonUnirse" onclick="unirseASalaManual()"
+                    class="divGenerico cajaConContenido botonDesactivado" disabled>
+                    UNIRSE A UNA PARTIDA
+                </button>
+            </div>
+
+            <div class="seleccionFila">
+                <div class="zonaIconos">
+                    <div id="modoBomba" onclick="seleccionarModo('Bomba')"
+                        class="divGenerico cajaConContenido modoDeJuego">
+                        <span>BOMBA</span>
+                    </div>
+                    <div id="modoTrivial" onclick="seleccionarModo('Trivial')"
+                        class="divGenerico cajaConContenido modoDeJuego">
+                        <span>TRIVIAL</span>
+                    </div>
+                </div>
+                <div class="divGenerico cajaConContenido ponerCodigo">
+                    <input type="text" id="inputCodigo" placeholder="CÓDIGO (4 LETRAS)" maxlength="4"
+                        oninput="validarCodigo(this)">
+                    <!-- "this" sirve para pillar el <input> entero y mandárselo a la func validarCodigo.  -->
+                </div>
+            </div>
+        </main>
+
+        <section id="salasPublicas">
+
+        </section>
+
+        <footer class="footer">
+            <div class="divGenerico cajaConContenido contenidoFooter">
+                <span>Creador por David y Jose Antonio</span>
+            </div>
+        </footer>
+    </div>
+
+    <script defer src="/socket.io/socket.io.js"></script>
+    <script defer src="../JS/JSIndex.js"></script>
+</body>
+
+</html>

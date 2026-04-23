@@ -1,0 +1,186 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background-color: #0f1115;
+    color: #e1e1e6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* --- ESTRUCTURA DIVPRINCIPAL--- */
+.divPrincipal {
+    width: 100%;
+    max-width: 900px;
+    height: 100vh;
+    background-color: #1a1c22;
+    border: 1px solid #3a3f4b;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 15px;
+}
+
+.divGenerico {
+    border: 1px solid #3a3f4b;
+    background-color: #2d323e;
+    color: #e1e1e6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header .nombreProyecto {
+    font-size: 2.9rem;
+    letter-spacing: 5px;
+    background: #252932;
+}
+
+.cajaConContenido {
+    width: 100%;
+    height: 100%;
+}
+
+/* --- SECCIONES MENÚ --- */
+.header {
+    height: 10%;
+}
+
+.zonaSeleccion {
+    height: 15%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.seleccionFila {
+    display: flex;
+    gap: 10px;
+    height: 100%;
+}
+
+.zonaIconos {
+    width: 50%;
+    display: flex;
+    gap: 10px;
+}
+
+.ponerCodigo {
+    width: 50%;
+}
+
+.ponerCodigo input {
+    background: transparent;
+    border: none;
+    color: white;
+    text-align: center;
+    outline: none;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+/* --- PANEL SALAS --- */
+#salasPublicas {
+    flex: 1;
+    flex-shrink: 1;
+    display: flex;
+}
+
+.salasCreadas {
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 20px;
+    background: #15171c;
+}
+
+.contenedorSalas {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.tarjetaSalaPublica {
+    background: #252932;
+    border: 1px solid #3a3f4b;
+    padding: 15px;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    height: fit-content; 
+}
+
+.codigoSala {
+    color: #00f2ff;
+    font-size: 1.1rem;
+}
+
+.creadorSala {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.botonEntrar {
+    margin-top: 10px;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.footer {
+    height: 8%;
+}
+
+.contenidoFooter {
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+.modoDeJuego {
+    width: 50%;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+/* --- INTERACTIVIDAD Y ESTADOS --- */
+.modoDeJuego:hover {
+    background-color: #3a3f4b;
+}
+
+.modoSeleccionado {
+    background-color: #4a90e2 !important;
+    border: 2px solid #00f2ff !important;
+    transform: scale(0.95);
+}
+
+.botonDesactivado, button:disabled {
+    opacity: 0.2;
+    cursor: not-allowed !important;
+    pointer-events: none;
+    filter: grayscale(1);
+    font-size: 1rem;
+}
+
+.botonActivo {
+    opacity: 1 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    background-color: #4a90e2 !important;
+    border: 1px solid #00f2ff !important;
+    filter: none !important;
+    font-size: 0.95rem;
+}
