@@ -5,22 +5,22 @@
 }
 
 body {
-    background-color: #0f1115; /* Fondo general ultra oscuro */
+    background-color: #0f1115; 
     color: #ffffff;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     height: 100vh;
-    overflow: hidden; /* Evita cualquier scroll en la pantalla */
+    overflow: hidden; 
 }
 
-/* --- LAYOUT PRINCIPAL (GRID) --- */
+/* --- GRID PRICIPAL --- */
 #layoutJuego {
     display: grid;
-    grid-template-columns: 300px 1fr; /* 300px chat, el resto el juego */
+    grid-template-columns: 300px 1fr; 
     height: 100vh;
     width: 100vw;
 }
 
-/* --- ZONA CHAT (IZQUIERDA) --- */
+/* --- ZONA DEL CHAT --- */
 #zonaChat {
     background-color: #15171c;
     border-right: 1px solid #3a3f4b;
@@ -60,22 +60,21 @@ body {
     border-color: #00f2ff;
 }
 
-/* --- ARENA DE JUEGO (DERECHA) --- */
+/* --- LA ARENA DE JUEGO --- */
 #arenaJuego {
     display: flex;
     flex-direction: column;
     height: 100%;
     padding: 20px 40px;
-    background-color: #1a1c22; /* Un gris muy oscuro, distinto al chat */
+    background-color: #1a1c22; 
     position: relative;
 }
 
-/* Cabecera (SALA y SALIR) */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 20; /* Siempre por encima */
+    z-index: 20;
 }
 
 .btnSalir {
@@ -92,32 +91,29 @@ header {
     border-color: #ff0055;
 }
 
-/* --- ÁREA DE COMBATE (DONDE PASA LA MAGIA) --- */
 #areaJuego {
-    position: relative; /* Clave para posicionar el contador, bomba y jugadores */
+    position: relative; 
     flex-grow: 1;
     display: flex;
     align-items: center;
-    justify-content: center; /* Centra la bomba perfectamente */
+    justify-content: center; 
     width: 100%;
 }
 
-/* TEMPORIZADOR (Centrado arriba dentro del área de combate) */
 #temporizador {
     position: absolute;
-    top: 20px; /* Separación desde el techo del área de combate */
+    top: 20px; 
     left: 50%;
-    transform: translateX(-50%); /* Centrado perfecto horizontalmente */
+    transform: translateX(-50%); 
     font-size: 5rem;
     font-weight: bold;
-    color: #ff3366; /* Rojo/Rosado vibrante */
+    color: #ff3366; 
     z-index: 10;
 }
 
-/* CONTENEDOR DE LA BOMBA */
 #divBomba {
     position: relative;
-    width: 220px; /* Tamaño de la bomba */
+    width: 220px; 
     height: 220px;
     display: flex;
     justify-content: center;
@@ -130,41 +126,26 @@ header {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    z-index: 2; /* Cubre a la flecha */
+    z-index: 2; 
 }
 
 #silaba {
     position: relative;
-    z-index: 3; /* Por encima de la textura de la bomba */
+    z-index: 3; 
     font-size: 4rem;
     font-weight: bold;
-    color: #fce8a4; /* Amarillento cálido */
+    color: #fce8a4; 
     letter-spacing: 2px;
 }
 
-/* FLECHA DE TURNO (Nace en el centro) */
-#flecha-turno {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 50px; /* Ajusta este valor si tu flecha es muy grande o pequeña */
-    height: auto;
-    z-index: 1; /* Escondida detrás de la bomba */
-    transform-origin: center;
-    /* La transición la hace girar suavemente. El script se encarga de moverla hacia afuera */
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-    transform: translate(-50%, -50%); /* Posición oculta inicial */
-}
-
-/* --- JUGADORES EN CÍRCULO --- */
 #contenedorJugadores {
     position: absolute; 
     width: 100%;
     height: 100%;
     top: 0;
     left: 0;
-    pointer-events: none; /* Para no tapar clics en otras cosas */
-    z-index: 5; /* Por debajo de la bomba, por si se acercan mucho */
+    pointer-events: none; 
+    z-index: 5; 
 }
 
 .jugador-card {
@@ -208,23 +189,24 @@ header {
     margin-top: 3px;
 }
 
-/* Turno activo: Brillo y color cian */
 .turno-activo {
     transform: scale(1.15); 
 }
+
 .turno-activo .jugador-icono {
     border-color: #00f2ff;
     box-shadow: 0 0 25px rgba(0, 242, 255, 0.6);
 }
+
 .turno-activo .jugador-nombre {
     color: #00f2ff;
 }
 
-/* Muerto: Apagado */
 .muerto {
     opacity: 0.3;
     filter: grayscale(100%);
 }
+
 .muerto .jugador-nombre {
     text-decoration: line-through;
     color: #888;
