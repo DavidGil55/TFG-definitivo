@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,42 +9,48 @@
 </head>
 
 <body>
-    <div id="layout-juego">
-        <aside id="zona-chat">
-            <div id="chat-mensajes"></div>
+
+    <div id="layoutJuego">
+
+        <aside id="zonaChat">
+            <div id="mensajesChat"></div>
             <input type="text" id="inputChat" placeholder="Escribe en el chat...">
         </aside>
 
-        <main id="arena-central">
-            <header class="header-juego">
-                 <h2 id="codigo-sala">SALA: ----</h2>
-                 <button onclick="window.location.href='/'" class="btn-salir">SALIR</button>
+        <main id="arenaJuego">
+
+            <header>
+                <h2 id="codigoSala">SALA: ----</h2>
+                <button onclick="window.location.href='/'" class="btnSalir">SALIR</button>
             </header>
 
-            <div class="area-combate">
-                <div id="temporizador">10</div> 
-                
+            <div id="areaJuego">
+                <div id="temporizador">10</div>
+
                 <div id="contenedorJugadores"></div>
-                
-                <div id="bomba-wrapper">
-                    
-                    <img src="../IMG/BOMBA.png" alt="Bomba" id="img-bomba">
-                    
+
+                <div id="divBomba">
+
+                    <img src="../IMG/BOMBA.png" alt="Bomba" id="imgBomba">
+
                     <div id="silaba">--</div>
                 </div>
             </div>
 
-            <div class="controles-inferiores">
-                <button id="btn-revancha" class="btn-salir" style="display: none; background-color: #00f2ff; color: #000; font-weight: bold; margin-bottom: 10px;">
+            <div id="controlesInferiores">
+                <button id="btnRevancha" class="btnSalir">
                     JUGARSE LA REVANCHA
                 </button>
                 <input type="text" id="inputPalabra" autofocus placeholder="Espera tu turno...">
-                <div id="log-juego">Esperando jugadores...</div>
+                <div id="logJuego">Esperando jugadores...</div>
             </div>
+
         </main>
+
     </div>
 
     <script defer src="/socket.io/socket.io.js"></script>
     <script defer src="../JS/JSBomba.js"></script>
 </body>
+
 </html>

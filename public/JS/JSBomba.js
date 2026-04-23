@@ -6,10 +6,10 @@ textoSilaba = document.getElementById("silaba"),
 contenedorJugadores = document.getElementById("contenedorJugadores"),
 inputPalabra = document.getElementById("inputPalabra"),
 inputChat = document.getElementById("inputChat"),
-mensajesChat = document.getElementById("chat-mensajes"),
-tituloSala = document.getElementById("codigo-sala"),
-logJuego = document.getElementById("log-juego"),
-botonRevancha = document.getElementById("btn-revancha");
+mensajesChat = document.getElementById("mensajesChat"),
+tituloSala = document.getElementById("codigoSala"),
+logJuego = document.getElementById("logJuego"),
+botonRevancha = document.getElementById("btnRevancha");
 
 // Aquí se obtiene el código de la sala mediante el URL.
 const parametrosURL = new URLSearchParams(window.location.search);
@@ -67,7 +67,8 @@ socket.on("estado-juego", (estado) => {
         if (estado.enJuego || estado.preparando) {
             contadorCentral.innerText = estado.preparando ? "Esperando..." : estado.tiempo;
         } else {
-            contadorCentral.innerText = "⏳";
+            contadorCentral.innerText = "Esperando jugadores...";
+            contadorCentral.style.fontSize = "2rem";
         }
     }
 
