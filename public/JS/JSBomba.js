@@ -9,11 +9,37 @@ inputChat = document.getElementById("inputChat"),
 mensajesChat = document.getElementById("mensajesChat"),
 tituloSala = document.getElementById("codigoSala"),
 logJuego = document.getElementById("logJuego"),
-botonRevancha = document.getElementById("btnRevancha");
+botonRevancha = document.getElementById("btnRevancha"),
+botonCambio = document.getElementById("cambioChat"),
+infoSalaEstado = document.getElementById("info-sala-estado");
 
 // Aquí se obtiene el código de la sala mediante el URL.
 const parametrosURL = new URLSearchParams(window.location.search);
 const codigoSala = parametrosURL.get("sala");
+
+let pedirInfo = ""; 
+
+botonCambio.addEventListener("click", () => {
+    if (mensajesChat.style.display !== "none") {
+        mensajesChat.style.display = "none";
+        infoSalaEstado.style.display = "block";
+        botonCambio.innerText = "Volver al chat"
+        inputChat.style.display = "none"; 
+
+        pedirInfo = setInterval(() => {
+            socket.emit("pedir-info-sala");
+        }, 500);
+
+    } else {
+        mensajesChat.style.display = "block";
+        infoSalaEstado.style.display = "none";
+        inputChat.style.display = "block"; 
+        botonCambio.innerText = "Ver información de la sala";
+        clearInterval(pedirInfo);
+        pedirInfo = ""; 
+    }
+});
+
 
 // Unirse a la sala
 function unirseSala(sala) {
@@ -32,7 +58,7 @@ unirseSala(codigoSala);
 // --- EVENTOS DEL JUGADOR ---
 
 // Enviar mensaje de chat
-inputChat.addEventListener("keydown", (evento) => {
+inputChat.addEventListener("keydown", evento => {
     if (evento.key === "Enter" && inputChat.value.trim() !== "") {
         socket.emit("enviar-chat", inputChat.value);
         inputChat.value = "";
@@ -181,4 +207,11 @@ socket.on("error-palabra", mensaje => {
     setTimeout(() => {
         inputPalabra.style.borderColor = "#3a3f4b";
     }, 500);
+});
+
+socket.on("estado-sala", (objetoSala) => {
+    if (infoSalaEstado) {
+        // Formateamos el objeto con 4 espacios para que se vea como en la terminal
+        infoSalaEstado.textContent = JSON.stringify(objetoSala, null, 4);
+    }
 });

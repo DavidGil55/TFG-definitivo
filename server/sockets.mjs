@@ -84,6 +84,16 @@ export function configurarSockets(io) {
                 });
         });
 
+        socket.on("pedir-info-sala", () => {
+            // socket.salaActual = la sala actual en la que está el jugador...
+            const sala = socket.salaActual;
+            if (sala && estadosSalas[sala]) {
+                const infoSegura = estadosSalas[sala];
+                infoSegura.intervalo = infoSegura.intervalo ? "En marcha..." : "Detenido.";
+                socket.emit("estado-sala", infoSegura);
+            }
+        });
+
         socket.on("enviar-palabra", (palabraRaw) => {
             const sala = socket.salaActual;
             const info = estadosSalas[sala];

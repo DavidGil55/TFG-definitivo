@@ -15,6 +15,13 @@
         <aside id="zonaChat">
             <div id="mensajesChat"></div>
             <input type="text" id="inputChat" placeholder="Escribe en el chat...">
+            
+            <!-- Se utliza <pre> porque respeta las tabulaciones del .json -->
+            <pre id="info-sala-estado" style="display: none;">
+                Esperando los datos de la sala...
+            </pre>
+
+            <button id="cambioChat">Ver información de la sala</button>
         </aside>
 
         <main id="arenaJuego">

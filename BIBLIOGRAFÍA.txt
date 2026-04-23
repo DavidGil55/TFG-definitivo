@@ -56,3 +56,5 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/fit-content
 https://stackoverflow.com/questions/49352757/check-if-string-contains-set-of-other-string has, función de los sets.
 
 https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Set/add add, función de los sets.
+
+https://developer.mozilla.org/es/docs/Web/API/Window/setInterval set interval js.

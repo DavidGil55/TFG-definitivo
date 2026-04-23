@@ -27,23 +27,24 @@ body {
     display: flex;
     flex-direction: column;
     padding: 15px;
+    gap: 10px; 
 }
 
 #mensajesChat {
-    flex-grow: 1;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-bottom: 15px;
     padding-right: 5px;
-    font-size: 0.9rem;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 0.8rem;
+    flex-grow: 1;
 }
 
 #mensajesChat div {
     background-color: #252932;
     padding: 10px;
-    word-wrap: break-word;
+    word-wrap: break-word; /* Para que la palabra de la vuelta*/ 
 }
 
 #inputChat {
@@ -65,7 +66,10 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 20px 40px;
+    padding-top: 20px;    
+    padding-bottom: 20px; 
+    padding-right: 40px;  
+    padding-left: 40px;   
     background-color: #1a1c22; 
     position: relative;
 }
@@ -266,4 +270,28 @@ header {
     color: #000; 
     font-weight: bold; 
     margin-bottom: 10px;
+}
+
+#info-sala-estado {
+    background-color: #1e1e1e;
+    color: #4af626;
+    padding: 5px;
+    font-family: monospace;
+    white-space: pre-wrap; 
+    flex-grow: 1;
+}
+
+#cambioChat {
+    background-color: #1d212c;
+    border: 1px solid #47577c;
+    color: white;
+    padding: 12px;
+    outline: none;
+    font-size: 1rem;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+#cambioChat:hover {
+    background-color: #2a3040;
 }
