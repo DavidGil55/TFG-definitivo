@@ -14,7 +14,7 @@ export const enviarEstadoLimpio = (io, sala) => {
     const estadoSeguro = {
         silaba: info.silaba,
         jugadores: info.jugadores,
-        turnoActual: info.turnoActual,
+        indiceTurno: info.indiceTurno,
         tiempo: info.tiempo,
         enJuego: info.enJuego,
         preparando: info.preparando
@@ -45,7 +45,7 @@ export const iniciarPartida = (io, sala) => {
             if (!estadosSalas[sala]) return;
             
             if (info.jugadores.length === 1) {
-                reiniciarSala(io, sala, "Partida detenida. Faltan jugadores...");
+                detenerPartida(io, sala, "Partida detenida. Faltan jugadores...");
                 return; 
             }           
 
@@ -53,15 +53,15 @@ export const iniciarPartida = (io, sala) => {
             info.enJuego = true;
             info.tiempo = 10;
             info.silaba = generarDosLetras();
-            info.turnoActual = info.jugadores.findIndex(j => j.vivo);
-            if(info.turnoActual === -1) info.turnoActual = 0;
+            info.indiceTurno = info.jugadores.findIndex(j => j.vivo);
+            if(info.indiceTurno === -1) info.indiceTurno = 0;
 
             io.to(sala).emit("evento-log", "¡A JUGAR!");
             
             info.intervalo = setInterval(() => {
                 info.tiempo--;
                 if (info.tiempo <= 0) {
-                    const jugadorActual = info.jugadores[info.turnoActual];
+                    const jugadorActual = info.jugadores[info.indiceTurno];
                     jugadorActual.vidas--;
                     io.to(sala).emit("evento-log", ` ¡BOOM! ${jugadorActual.nombre} pierde una vida.`);
 
@@ -83,25 +83,29 @@ export const siguienteTurno = (io, sala) => {
     const info = estadosSalas[sala];
     if (!info) return;
 
+    // Si solo hay una persona en la sala se detiene la partida
     if (info.jugadores.length === 1) {
-        reiniciarSala(io, sala, "Partida detenida. Faltan jugadores...");
+        detenerPartida(io, sala, "Partida detenida. Faltan jugadores...");
         return; 
     }
 
-    const vivos = info.jugadores.filter(j => j.vivo);
-    if (vivos.length <= 1 && info.jugadores.length > 1) {
+    const jugadoresVivos = info.jugadores.filter(jugador => jugador.vivo);
+
+    if (jugadoresVivos.length === 1 && info.jugadores.length > 1) {
         clearInterval(info.intervalo);
         info.enJuego = false;
-        const ganador = vivos.length === 1 ? vivos[0].nombre : "Nadie";
-        io.to(sala).emit("evento-log", ` ¡${ganador} HA GANADO LA PARTIDA!`);
+        const ganador = jugadoresVivos[0].nombre;
+        io.to(sala).emit("evento-log", `${ganador} HA GANADO LA PARTIDA!`);
         enviarEstadoLimpio(io, sala); 
         return;
     }
 
+    // Aquí se calcula el indiceTurno, el cual sigue al jugador que le toca.
     do {
-        info.turnoActual = (info.turnoActual + 1) % info.jugadores.length;
-    } while (!info.jugadores[info.turnoActual].vivo && vivos.length > 1);
+        info.indiceTurno = (info.indiceTurno + 1) % info.jugadores.length;
+    } while (!info.jugadores[info.indiceTurno].vivo && jugadoresVivos.length > 1);
 
+    // Se reinicia la sala...
     info.tiempo = 10;
     info.silaba = generarDosLetras();
     enviarEstadoLimpio(io, sala); 
@@ -116,7 +120,7 @@ export const penalizarTiempo = (io, sala) => {
     enviarEstadoLimpio(io, sala);
 };
 
-const reiniciarSala = (io, sala, mensajeAviso = "") => {
+const detenerPartida = (io, sala, mensajeAviso = "") => {
     const info = estadosSalas[sala];
     if (!info) return;
 
@@ -128,10 +132,12 @@ const reiniciarSala = (io, sala, mensajeAviso = "") => {
     info.tiempo = 10;
     info.silaba = "";
     info.palabrasUsadas = [];
-    info.turnoActual = 0;
+    info.indiceTurno = 0;
+
     // Se vuelve al único jugador que hay a su estado por defecto...
     info.jugadores[0].vidas = 2;
     info.jugadores[0].vivo = true;
+
     // Se envía la información al log y el estado.
     io.to(sala).emit("evento-log", mensajeAviso);
     enviarEstadoLimpio(io, sala);

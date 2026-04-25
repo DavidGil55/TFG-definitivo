@@ -1,3 +1,4 @@
+/* La pantalla general */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -12,7 +13,6 @@ body {
     overflow: hidden; 
 }
 
-/* --- GRID PRICIPAL --- */
 #layoutJuego {
     display: grid;
     grid-template-columns: 300px 1fr; 
@@ -20,7 +20,7 @@ body {
     width: 100vw;
 }
 
-/* --- ZONA DEL CHAT --- */
+/* La zona del chat */
 #zonaChat {
     background-color: #15171c;
     border-right: 1px solid #3a3f4b;
@@ -44,7 +44,8 @@ body {
 #mensajesChat div {
     background-color: #252932;
     padding: 10px;
-    word-wrap: break-word; /* Para que la palabra de la vuelta*/ 
+    /* Para que la palabra de la vuelta y no se salga de la pantalla.*/ 
+    word-wrap: break-word; 
 }
 
 #inputChat {
@@ -61,8 +62,8 @@ body {
     border-color: #00f2ff;
 }
 
-/* --- LA ARENA DE JUEGO --- */
-#arenaJuego {
+/* El área de juego */
+#areaJuego {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -222,7 +223,7 @@ header {
     color: #888;
 }
 
-/* --- CONTROLES INFERIORES --- */
+/* Los controles inferiores */
 #controlesInferiores {
     display: flex;
     flex-direction: column;
@@ -269,13 +270,14 @@ header {
     color: #ff0055;
 }
 
-#info-sala-estado {
+#infoSalaEstado {
     background-color: #1e1e1e;
     color: #4af626;
     padding: 5px;
     font-family: monospace;
     white-space: pre-wrap; 
     flex-grow: 1;
+    display: none;
 }
 
 #cambioChat {

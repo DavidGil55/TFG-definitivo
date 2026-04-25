@@ -15,7 +15,7 @@ body {
     overflow: hidden;
 }
 
-/* --- ESTRUCTURA DIVPRINCIPAL--- */
+/* La estructura del div princiapal */
 .divPrincipal {
     width: 100%;
     max-width: 900px;
@@ -48,7 +48,7 @@ body {
     height: 100%;
 }
 
-/* --- SECCIONES MENÚ --- */
+/* Las secciones del menú */
 .header {
     height: 10%;
 }
@@ -86,7 +86,7 @@ body {
     text-transform: uppercase;
 }
 
-/* --- PANEL SALAS --- */
+/* Todo lo relacioando con las salas */
 #salasPublicas {
     flex: 1;
     flex-shrink: 1;
@@ -141,6 +141,7 @@ body {
     font-weight: bold;
 }
 
+/* El footer */
 .footer {
     height: 8%;
 }
@@ -156,7 +157,7 @@ body {
     cursor: pointer;
 }
 
-/* --- INTERACTIVIDAD Y ESTADOS --- */
+/* Cosas interactuables */
 .modoDeJuego:hover {
     background-color: #3a3f4b;
 }

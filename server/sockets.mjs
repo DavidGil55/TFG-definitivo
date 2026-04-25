@@ -19,7 +19,7 @@ export function configurarSockets(io) {
                     silaba: "",
                     palabrasUsadas: [],
                     jugadores: [],
-                    turnoActual: 0,
+                    indiceTurno: 0,
                     tiempo: 10,
                     enJuego: false,
                     preparando: false, 
@@ -92,34 +92,34 @@ export function configurarSockets(io) {
             }
         });
 
-        socket.on("enviar-palabra", (palabraRaw) => {
+        socket.on("enviar-palabra", (palabraSucia) => {
             const sala = socket.salaActual;
             const info = estadosSalas[sala];
 
-            // Si no hay sala, o no están jugando o están en estado de preparación, no envíes la palabra a la bomba.
-            if (!info || !info.enJuego || info.preparando) return;
+            // Si no hay sala, no envíes la palabra a la bomba.
+            if (!info) return;
 
-            const jugadorTurno = info.jugadores[info.turnoActual];
-            if (jugadorTurno.id !== socket.id) return socket.emit("error-palabra", "No es tu turno");
+            const turnoJugador = info.jugadores[info.indiceTurno];
+            if (turnoJugador.id !== socket.id) return socket.emit("error-palabra", "Que no es tu turno!");
 
-            const p = palabraRaw.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const palabraLimpia = palabraSucia.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-            // SI LA PALABRA YA SE USÓ:
-            if (info.palabrasUsadas.includes(p)) {
-                penalizarTiempo(io, sala); // <-- RESTA 1 SEGUNDO
-                return socket.emit("error-palabra", "¡Esa palabra ya se usó!");
+            // Si la palabra ya se usó...
+            if (info.palabrasUsadas.includes(palabraLimpia)) {
+                penalizarTiempo(io, sala); 
+                return socket.emit("error-palabra", "Esa palabra ya se usó.");
             }
 
-            // SI LA PALABRA ES CORRECTA:
-            if (p.includes(info.silaba.toLowerCase()) && diccionario.has(p)) {
-                info.palabrasUsadas.push(p);
-                io.to(sala).emit("evento-log", `Palabra correcta ${socket.nombreUsuario}: ${p}`);
+            // Si la palabra es correcta...
+            if (palabraLimpia.includes(info.silaba.toLowerCase()) && diccionario.has(palabraLimpia)) {
+                info.palabrasUsadas.push(palabraLimpia);
+                io.to(sala).emit("evento-log", `Palabra correcta ${socket.nombreUsuario}: ${palabraLimpia}`);
                 siguienteTurno(io, sala); 
-            } else {
-            // SI LA PALABRA ES INCORRECTA O INVENTADA:
-                penalizarTiempo(io, sala); // <-- RESTA 1 SEGUNDO
-                socket.emit("error-palabra", "Palabra no válida");
+                return;
             }
+            // Si la palabra es incorrecta o se la ha inventado...
+                penalizarTiempo(io, sala); 
+                socket.emit("error-palabra", "Palabra no válida");
         });
 
         socket.on("disconnect", () => {
@@ -146,8 +146,8 @@ export function configurarSockets(io) {
                     const jugadoresVivos = info.jugadores.filter(jugador => jugador.vivo).length;
                     if (info.enJuego && jugadoresVivos <= 1) {
                         siguienteTurno(io, sala);
-                    } else if (info.turnoActual >= info.jugadores.length) {
-                        info.turnoActual = 0;
+                    } else if (info.indiceTurno >= info.jugadores.length) {
+                        info.indiceTurno = 0;
                     }
 
                     enviarEstadoLimpio(io, sala);

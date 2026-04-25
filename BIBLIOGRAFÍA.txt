@@ -58,3 +58,5 @@ https://stackoverflow.com/questions/49352757/check-if-string-contains-set-of-oth
 https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Set/add add, función de los sets.
 
 https://developer.mozilla.org/es/docs/Web/API/Window/setInterval set interval js.
+
+https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Array/filter filter js.

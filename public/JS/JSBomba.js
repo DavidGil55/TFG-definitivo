@@ -135,7 +135,7 @@ socket.on("estado-juego", estado => {
         tarjetaJugador.className = "tarjetaJugador";
 
         // Clases del CSS para el turno activo y si el jugador está muerto
-        if (estado.enJuego && indice === estado.turnoActual && jugador.vivo) {
+        if (estado.enJuego && indice === estado.indiceTurno && jugador.vivo) {
             tarjetaJugador.classList.add("turnoActivo");
         }
         if (!jugador.vivo) {
@@ -164,7 +164,7 @@ socket.on("estado-juego", estado => {
     // 4. Gestión del Input (Habilitar/Deshabilitar teclado)
     if (inputPalabra) {
         if (estado.enJuego && !estado.preparando && nJugadores > 0) {
-            const jugadorTurno = jugadores[estado.turnoActual];
+            const jugadorTurno = jugadores[estado.indiceTurno];
             const esMiTurno = jugadorTurno && (jugadorTurno.id === socket.id) && jugadorTurno.vivo;
 
             inputPalabra.disabled = !esMiTurno;
