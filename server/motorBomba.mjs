@@ -116,7 +116,7 @@ export const penalizarTiempo = (io, sala) => {
     enviarEstadoLimpio(io, sala);
 };
 
-export const reiniciarSala = (io, sala, mensajeAviso = "") => {
+const reiniciarSala = (io, sala, mensajeAviso = "") => {
     const info = estadosSalas[sala];
     if (!info) return;
 
