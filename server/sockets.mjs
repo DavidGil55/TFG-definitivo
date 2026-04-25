@@ -56,10 +56,10 @@ export function configurarSockets(io) {
             io.to(codigoSala).emit("mensaje-chat", { usuario: "<span id=\"spanSistema\">SISTEMA</span>", mensaje: `${socket.nombreUsuario} se unió.` });
 
             if (info.jugadores.length >= 2 && !info.enJuego && !info.preparando) {
-                iniciarPartida(io, codigoSala);
-            } else {
-                enviarEstadoLimpio(io, codigoSala);
-            }
+                // El return sirve para terminar la ejecuión de la función.
+                return iniciarPartida(io, codigoSala);
+            } 
+            enviarEstadoLimpio(io, codigoSala);
         });
 
         // Hacer la revancha que le den almenos dos jugadores de la sala para que ocurra...
@@ -88,7 +88,8 @@ export function configurarSockets(io) {
             // socket.salaActual = la sala actual en la que está el jugador...
             const sala = socket.salaActual;
             if (sala && estadosSalas[sala]) {
-                const infoSegura = estadosSalas[sala];
+                // Los ... crean una copia del objeto y se la guarda en infoSegura, pero el objeto original sigue intacto...
+                const infoSegura = { ...estadosSalas[sala] };
                 infoSegura.intervalo = infoSegura.intervalo ? "En marcha..." : "Detenido.";
                 socket.emit("estado-sala", infoSegura);
             }
@@ -128,13 +129,15 @@ export function configurarSockets(io) {
             const sala = socket.salaActual;
             const info = estadosSalas[sala];
 
-            if (sala && info) {
-                const jugadorDesconectado = info.jugadores.find(j => j.id === socket.id);
+            if (info) {
+                const jugadorDesconectado = info.jugadores.find(jugador => jugador.id === socket.id);
                 if (jugadorDesconectado) {
-                    io.to(sala).emit("mensaje-chat", { usuario: "<span id=\"spanSistema\">SISTEMA</span>", mensaje: `${jugadorDesconectado.nombre} salió.` });
+                    io.to(sala).emit("mensaje-chat", { 
+                        usuario: "<span id=\"spanSistema\">SISTEMA</span>", 
+                        mensaje: `${jugadorDesconectado.nombre} salió.` 
+                    });
                 }
-
-                info.jugadores = info.jugadores.filter(j => j.id !== socket.id);
+                info.jugadores = info.jugadores.filter(jugador => jugador.id !== socket.id);
 
                 if (info.jugadores.length === 0) {
                     clearInterval(info.intervalo); 
@@ -143,15 +146,15 @@ export function configurarSockets(io) {
                 } else {
                     if (infoPublicaSalas[sala]) infoPublicaSalas[sala].jugadores = info.jugadores.length;
 
-                    const vivosRestantes = info.jugadores.filter(j => j.vivo).length;
-                    if (info.enJuego && vivosRestantes <= 1) {
+                    const jugadoresVivosRestantes = info.jugadores.filter(jugador => jugador.vivo).length;
+                    if (info.enJuego && jugadoresVivosRestantes <= 1) {
                         siguienteTurno(io, sala);
                     } else if (info.turnoActual >= info.jugadores.length) {
                         info.turnoActual = 0;
                     }
 
                     enviarEstadoLimpio(io, sala);
-                    io.to(sala).emit("evento-log", `${socket.nombreUsuario} se desconectó.`);
+                    io.to(sala).emit("evento-log", `${socket.nombreUsuario} se desconectó...`);
                 }
                 io.emit("lista-salas-actualizada", Object.values(infoPublicaSalas));
             }
