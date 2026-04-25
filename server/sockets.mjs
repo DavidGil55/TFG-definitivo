@@ -36,10 +36,6 @@ export function configurarSockets(io) {
                 vidas: 2, 
                 vivo: true 
             });
-            
-            console.log(`\n--- ESTADO ACTUAL DE LA SALA: ${codigoSala} ---`);
-            console.dir(info, { depth: null }); // Usamos console.dir para ver todo el objeto sin que salga [Object]
-            console.log("-----------------------------------\n");
 
             if (!infoPublicaSalas[codigoSala]) {
                 infoPublicaSalas[codigoSala] = { 
@@ -87,10 +83,11 @@ export function configurarSockets(io) {
         socket.on("pedir-info-sala", () => {
             // socket.salaActual = la sala actual en la que está el jugador...
             const sala = socket.salaActual;
-            if (sala && estadosSalas[sala]) {
-                // Los ... crean una copia del objeto y se la guarda en infoSegura, pero el objeto original sigue intacto...
+            if (estadosSalas[sala]) {
+                // Los "..." crean una copia del objeto y se la guarda en infoSegura, pero el objeto original sigue intacto...
                 const infoSegura = { ...estadosSalas[sala] };
-                infoSegura.intervalo = infoSegura.intervalo ? "En marcha..." : "Detenido.";
+                // No se le puede pasar el setInterval() completo porque es un objeto en sí muy grande...
+                infoSegura.intervalo = infoSegura.intervalo ? "Está en marcha..." : "Detenido";
                 socket.emit("estado-sala", infoSegura);
             }
         });
@@ -146,8 +143,8 @@ export function configurarSockets(io) {
                 } else {
                     if (infoPublicaSalas[sala]) infoPublicaSalas[sala].jugadores = info.jugadores.length;
 
-                    const jugadoresVivosRestantes = info.jugadores.filter(jugador => jugador.vivo).length;
-                    if (info.enJuego && jugadoresVivosRestantes <= 1) {
+                    const jugadoresVivos = info.jugadores.filter(jugador => jugador.vivo).length;
+                    if (info.enJuego && jugadoresVivos <= 1) {
                         siguienteTurno(io, sala);
                     } else if (info.turnoActual >= info.jugadores.length) {
                         info.turnoActual = 0;

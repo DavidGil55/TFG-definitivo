@@ -30,15 +30,14 @@ botonCambio.addEventListener("click", () => {
         pedirInfo = setInterval(() => {
             socket.emit("pedir-info-sala");
         }, 500);
-
-    } else {
-        mensajesChat.style.display = "block";
-        infoSalaEstado.style.display = "none";
-        inputChat.style.display = "block"; 
-        botonCambio.innerText = "Ver información de la sala";
-        clearInterval(pedirInfo);
-        pedirInfo = ""; 
-    }
+        return;
+    } 
+    mensajesChat.style.display = "block";
+    infoSalaEstado.style.display = "none";
+    inputChat.style.display = "block"; 
+    botonCambio.innerText = "Ver información de la sala";
+    clearInterval(pedirInfo);
+    pedirInfo = ""; 
 });
 
 
@@ -58,7 +57,8 @@ unirseSala(codigoSala);
 
 // Salirse de la sala
 botonSalir.addEventListener("click", () => {
-    window.location.href = "/"; 
+    window.location.href = "/";
+    // Esto es un poco inútil... 
     socket.disconnect(); 
 });
 
@@ -74,7 +74,7 @@ inputChat.addEventListener("keydown", evento => {
 
 
 // Enviar palabra a la bomba
-inputPalabra.addEventListener("keydown", (evento) => {
+inputPalabra.addEventListener("keydown", evento => {
     if (evento.key === "Enter") {
         const palabra = inputPalabra.value.trim().toLowerCase();
         if (palabra.length > 0) {
@@ -94,7 +94,7 @@ if (botonRevancha) {
 
 // --- ACTUALIZACIONES DEL SERVIDOR ---
 
-socket.on("estado-juego", (estado) => {
+socket.on("estado-juego", estado => {
     // 1. Temporizador
     if (contadorCentral) {
         if (estado.enJuego || estado.preparando) {
@@ -115,8 +115,8 @@ socket.on("estado-juego", (estado) => {
     }
 
     // 3. Dibujar círculo de jugadores
-    const jugadores = estado.jugadores || [];
-    const numPlayers = jugadores.length;
+    const jugadores = estado.jugadores;
+    const nJugadores = jugadores.length; //numeroJugadores...
 
     if (contenedorJugadores) contenedorJugadores.innerHTML = "";
 
@@ -124,14 +124,14 @@ socket.on("estado-juego", (estado) => {
 
     jugadores.forEach((jugador, index) => {
         // Matemáticas para repartir en círculo
-        const anguloRad = (index / numPlayers) * (2 * Math.PI) - (Math.PI / 2);
+        const anguloRad = (index / nJugadores) * (2 * Math.PI) - (Math.PI / 2);
         const x = Math.cos(anguloRad) * radius;
         const y = Math.sin(anguloRad) * radius;
 
         const playerCardDiv = document.createElement("div");
         playerCardDiv.className = "jugador-card";
 
-        // Clases de CSS para turno activo y muerte
+        // Clases del CSS para el turno activo y si el jugador está muerto
         if (estado.enJuego && index === estado.turnoActual && jugador.vivo) {
             playerCardDiv.classList.add("turno-activo");
         }
@@ -159,7 +159,7 @@ socket.on("estado-juego", (estado) => {
 
     // 4. Gestión del Input (Habilitar/Deshabilitar teclado)
     if (inputPalabra) {
-        if (estado.enJuego && !estado.preparando && numPlayers > 0) {
+        if (estado.enJuego && !estado.preparando && nJugadores > 0) {
             const jugadorTurno = jugadores[estado.turnoActual];
             const esMiTurno = jugadorTurno && (jugadorTurno.id === socket.id) && jugadorTurno.vivo;
 
@@ -185,9 +185,9 @@ socket.on("estado-juego", (estado) => {
     }
 
     // 5. Mostrar/Ocultar botón de Revancha
-    const vivos = jugadores.filter(j => j.vivo).length;
+    const jugadoresVivos = jugadores.filter(jugador => jugador.vivo).length;
     if (botonRevancha) {
-        if (!estado.enJuego && !estado.preparando && numPlayers > 1 && vivos <= 1) {
+        if (!estado.enJuego && !estado.preparando && nJugadores > 1 && jugadoresVivos <= 1) {
             botonRevancha.style.display = "block";
         } else {
             botonRevancha.style.display = "none";
@@ -205,7 +205,8 @@ socket.on("mensaje-chat", objetoMensaje => {
 });
 
 socket.on("evento-log", mensaje => {
-    if (logJuego) logJuego.innerText = mensaje;
+    if (!logJuego) return; 
+    logJuego.innerText = mensaje;
 });
 
 socket.on("error-palabra", mensaje => {
@@ -217,8 +218,7 @@ socket.on("error-palabra", mensaje => {
 });
 
 socket.on("estado-sala", (objetoSala) => {
-    if (infoSalaEstado) {
-        // Formateamos el objeto con 4 espacios para que se vea como en la terminal
+    if (!infoSalaEstado) return;
+        // Se formatea el .json para que se vea como en la terminal... 
         infoSalaEstado.textContent = JSON.stringify(objetoSala, null, 4);
-    }
 });

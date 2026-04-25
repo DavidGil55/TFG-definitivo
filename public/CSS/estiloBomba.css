@@ -90,7 +90,7 @@ header {
     transition: 0.2s;
 }
 
-#botonSalir, #botonRevancha {
+#botonRevancha {
     display: none; 
     background-color: #00f2ff; 
     color: #000; 
