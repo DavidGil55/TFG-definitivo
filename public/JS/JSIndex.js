@@ -1,15 +1,19 @@
 const socket = io();
 let modoSeleccionado = "";
 const listaSalas = new Map();
+// console.log(listaSalas);
+const botonUnirse = document.getElementById("botonUnirse"),
+botonBomba = document.getElementById("modoBomba"),
+botonTrivial = document.getElementById("modoTrivial"),
+botonCrear = document.getElementById("botonCrear"),
+input = document.getElementById("inputCodigo"),
+contenedor = document.getElementById("salasPublicas");
 
 console.log("Menú de inicio listo.");
 
 
 const seleccionarModo = function (modo) {
     // Se guardan los dos botones en variables. Así como el modo de juego seleccionado.
-    const botonBomba = document.getElementById("modoBomba"),
-    botonTrivial = document.getElementById("modoTrivial"),
-    botonCrear = document.getElementById("botonCrear"),
     elementoSeleccionado = document.getElementById("modo" + modo); // Puede ser o Bomba o Trivial.
     // Lógica de deselección de botones.
     // Si el modo seleccionado es EXACTAMENTE igual a "" (nada), se ejecuta el if.
@@ -44,9 +48,8 @@ const seleccionarModo = function (modo) {
 };
 
 const validarCodigo = function(codigoSala) {
-    const botonUnirse = document.getElementById("botonUnirse");
     let codigoSalaLimpio = codigoSala.value.replace(/[^a-zA-Z]/g, "").toUpperCase();
-    // Pone el código en mayúsculas en la pantalla del usuario. 
+    // Le pone el código en mayúsculas en la pantalla al usuario. 
     codigoSala.value = codigoSalaLimpio; 
     
     if (!listaSalas.has(codigoSalaLimpio)) {
@@ -63,7 +66,7 @@ const validarCodigo = function(codigoSala) {
     return;
 };
 
-const crearSala = () => {
+botonCrear.addEventListener("click", () => {
     const letras = "THEQUICKBROWNFOXJUMPSOVERTHELAZYDOG";
     let codigo = "";
 
@@ -82,22 +85,18 @@ const crearSala = () => {
     localStorage.setItem("modo-juego", modoSeleccionado); 
     console.log(`Creando la sala ${codigo}...`);
     window.location.href = `/${modoSeleccionado.toLowerCase()}?sala=${codigo}`; 
-};
+});
 
-const unirseASalaManual = function(clic) {
-    if (clic) clic.preventDefault();
-    const input = document.getElementById("inputCodigo");
-
+botonUnirse.addEventListener("click", () => {
     const codigo = input.value.toUpperCase().trim();
-    
+    // Si la lista de las salas tiene el código, entonces es que hay una sala.
     if (listaSalas.has(codigo)) {
         modoSeleccionado = listaSalas.get(codigo); 
         window.location.href = `/${modoSeleccionado.toLowerCase()}?sala=${codigo}`;
     }
-};
+})
 
 socket.on("lista-salas-actualizada", salas => {
-    const contenedor = document.getElementById("salasPublicas");
     contenedor.innerHTML = "";
     listaSalas.clear(); // Se reinician las salas para que no queden residuos... 
     // El servidor les pasa a TODOS los jugadores las salas nuevas, entonces si se está jugando una partida de bomba y te pasan los jugadores te da igual...

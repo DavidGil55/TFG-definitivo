@@ -19,7 +19,6 @@ const parametrosURL = new URLSearchParams(window.location.search);
 const codigoSala = parametrosURL.get("sala");
 
 let pedirInfo = ""; 
-
 botonCambio.addEventListener("click", () => {
     if (mensajesChat.style.display !== "none") {
         mensajesChat.style.display = "none";
