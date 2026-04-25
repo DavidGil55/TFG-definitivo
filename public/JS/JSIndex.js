@@ -72,15 +72,13 @@ const crearSala = () => {
         for (let i = 0; i < 4; i++) {
             codigo += letras.charAt(Math.floor(Math.random() * letras.length));
         }
-
         if (listaSalas.has(codigo)) {
             crearCodigo();
         }
     }
-
     crearCodigo();
 
-    // Guarda en el modo de juego en la memoria del navegador.
+    // Se guarda en el modo de juego en la memoria del navegador.
     localStorage.setItem("modo-juego", modoSeleccionado); 
     console.log(`Creando la sala ${codigo}...`);
     window.location.href = `/${modoSeleccionado.toLowerCase()}?sala=${codigo}`; 

@@ -2,7 +2,7 @@ import { generarDosLetras } from "./diccionario.mjs";
 
 // Variables de estado globales exportadas
 export const estadosSalas = {};
-export const infoPublicaSalas = {}; // Escaparate para ver las salas públicas que hay disponibles.
+export const infoPublicaSalas = {}; // El escaparate para ver las salas públicas que hay disponibles.
 
 export function enviarEstadoLimpio(io, sala) {
     const informacionSala = estadosSalas[sala];
