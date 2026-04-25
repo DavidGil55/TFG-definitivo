@@ -81,7 +81,7 @@ header {
     z-index: 20;
 }
 
-.btnSalir {
+#botonSalir {
     background-color: transparent;
     border: 1px solid #3a3f4b;
     color: white;
@@ -90,7 +90,15 @@ header {
     transition: 0.2s;
 }
 
-.btnSalir:hover {
+#botonSalir, #botonRevancha {
+    display: none; 
+    background-color: #00f2ff; 
+    color: #000; 
+    font-weight: bold; 
+    margin-bottom: 10px;
+}
+
+#botonSalir:hover, #botonRevancha:hover {
     background-color: #ff0055;
     border-color: #ff0055;
 }
@@ -264,13 +272,7 @@ header {
     color: #ff0055;
 }
 
-#btnRevancha {
-    display: none; 
-    background-color: #00f2ff; 
-    color: #000; 
-    font-weight: bold; 
-    margin-bottom: 10px;
-}
+
 
 #info-sala-estado {
     background-color: #1e1e1e;

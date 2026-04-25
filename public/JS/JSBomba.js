@@ -9,9 +9,10 @@ inputChat = document.getElementById("inputChat"),
 mensajesChat = document.getElementById("mensajesChat"),
 tituloSala = document.getElementById("codigoSala"),
 logJuego = document.getElementById("logJuego"),
-botonRevancha = document.getElementById("btnRevancha"),
+botonRevancha = document.getElementById("botonRevancha"),
 botonCambio = document.getElementById("cambioChat"),
-infoSalaEstado = document.getElementById("info-sala-estado");
+infoSalaEstado = document.getElementById("info-sala-estado"),
+botonSalir = document.getElementById("botonSalir");
 
 // Aquí se obtiene el código de la sala mediante el URL.
 const parametrosURL = new URLSearchParams(window.location.search);
@@ -54,6 +55,12 @@ function unirseSala(sala) {
 }
 
 unirseSala(codigoSala);
+
+// Salirse de la sala
+botonSalir.addEventListener("click", () => {
+    window.location.href = "/"; 
+    socket.disconnect(); 
+});
 
 // --- EVENTOS DEL JUGADOR ---
 
