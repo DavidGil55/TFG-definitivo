@@ -1,62 +1,71 @@
 import { generarDosLetras } from "./diccionario.mjs";
 
-// Variables de estado globales exportadas
+// Variables de estado globales
 export const estadosSalas = {};
-export const infoPublicaSalas = {}; // El escaparate para ver las salas públicas que hay disponibles.
+// El escaparate para ver las salas públicas que hay disponibles
+export const infoPublicaSalas = {}; 
 
-export function enviarEstadoLimpio(io, sala) {
-    const informacionSala = estadosSalas[sala];
-    if (!informacionSala) return;
+export const enviarEstadoLimpio = (io, sala) => {
+    const info = estadosSalas[sala];
+    // Si no hay información de la sala actual lo detiene todo...
+    if (!info) return;
 
+    // Esto es lo que recibe el front-end.
     const estadoSeguro = {
-        silaba: informacionSala.silaba,
-        jugadores: informacionSala.jugadores,
-        turnoActual: informacionSala.turnoActual,
-        tiempo: informacionSala.tiempo,
-        enJuego: informacionSala.enJuego,
-        preparando: informacionSala.preparando
+        silaba: info.silaba,
+        jugadores: info.jugadores,
+        turnoActual: info.turnoActual,
+        tiempo: info.tiempo,
+        enJuego: info.enJuego,
+        preparando: info.preparando
     };
     io.to(sala).emit("estado-juego", estadoSeguro);
 };
 
-export function iniciarPartida(io, sala) {
-    const informacionSala = estadosSalas[sala];
-    if (!informacionSala) return;
+export const iniciarPartida = (io, sala) => {
+    const info = estadosSalas[sala];
+    if (!info) return;
 
-    informacionSala.enJuego = false;
-    informacionSala.preparando = true;
+    info.enJuego = false;
+    info.preparando = true;
     io.to(sala).emit("evento-log", "¡Preparados...");
 
-    let cuenta = 3;
-    informacionSala.silaba = cuenta.toString();
+    let cuentraAtras = 5;
+    // Esto hace que se muestre la cuenta atrás dentro de la bomba.
+    info.silaba = cuentraAtras.toString();
     enviarEstadoLimpio(io, sala);
 
-    const cuentaInterval = setInterval(() => {
-        cuenta--;
-        if (cuenta > 0) {
-            informacionSala.silaba = cuenta.toString();
+    const cuentaIntervalo = setInterval(() => {
+        cuentraAtras--;
+        if (cuentraAtras > 0) {
+            info.silaba = cuentraAtras.toString();
             enviarEstadoLimpio(io, sala);
         } else {
-            clearInterval(cuentaInterval);
+            clearInterval(cuentaIntervalo);
             if (!estadosSalas[sala]) return;
             
-            informacionSala.preparando = false;
-            informacionSala.enJuego = true;
-            informacionSala.tiempo = 10;
-            informacionSala.silaba = generarDosLetras();
-            informacionSala.turnoActual = informacionSala.jugadores.findIndex(j => j.vivo);
-            if(informacionSala.turnoActual === -1) informacionSala.turnoActual = 0;
+            if (info.jugadores.length === 1) {
+                reiniciarSala(io, sala, "Partida detenida. Faltan jugadores...");
+                return; 
+            }           
+
+            info.preparando = false;
+            info.enJuego = true;
+            info.tiempo = 10;
+            info.silaba = generarDosLetras();
+            info.turnoActual = info.jugadores.findIndex(j => j.vivo);
+            if(info.turnoActual === -1) info.turnoActual = 0;
 
             io.to(sala).emit("evento-log", "¡A JUGAR!");
             
-            informacionSala.intervalo = setInterval(() => {
-                informacionSala.tiempo--;
-                if (informacionSala.tiempo <= 0) {
-                    const jugadorActual = informacionSala.jugadores[informacionSala.turnoActual];
+            info.intervalo = setInterval(() => {
+                info.tiempo--;
+                if (info.tiempo <= 0) {
+                    const jugadorActual = info.jugadores[info.turnoActual];
                     jugadorActual.vidas--;
                     io.to(sala).emit("evento-log", ` ¡BOOM! ${jugadorActual.nombre} pierde una vida.`);
 
-                    if (jugadorActual.vidas <= 0) {
+                    if (jugadorActual.vidas === 0) {
                         jugadorActual.vivo = false;
                         io.to(sala).emit("evento-log", ` ${jugadorActual.nombre} ha sido eliminado.`);
                     }
@@ -70,14 +79,19 @@ export function iniciarPartida(io, sala) {
     }, 1000);
 };
 
-export function siguienteTurno(io, sala) {
-    const informacionSala = estadosSalas[sala];
-    if (!informacionSala) return;
+export const siguienteTurno = (io, sala) => {
+    const info = estadosSalas[sala];
+    if (!info) return;
 
-    const vivos = informacionSala.jugadores.filter(j => j.vivo);
-    if (vivos.length <= 1 && informacionSala.jugadores.length > 1) {
-        clearInterval(informacionSala.intervalo);
-        informacionSala.enJuego = false;
+    if (info.jugadores.length === 1) {
+        reiniciarSala(io, sala, "Partida detenida. Faltan jugadores...");
+        return; 
+    }
+
+    const vivos = info.jugadores.filter(j => j.vivo);
+    if (vivos.length <= 1 && info.jugadores.length > 1) {
+        clearInterval(info.intervalo);
+        info.enJuego = false;
         const ganador = vivos.length === 1 ? vivos[0].nombre : "Nadie";
         io.to(sala).emit("evento-log", ` ¡${ganador} HA GANADO LA PARTIDA!`);
         enviarEstadoLimpio(io, sala); 
@@ -85,22 +99,40 @@ export function siguienteTurno(io, sala) {
     }
 
     do {
-        informacionSala.turnoActual = (informacionSala.turnoActual + 1) % informacionSala.jugadores.length;
-    } while (!informacionSala.jugadores[informacionSala.turnoActual].vivo && vivos.length > 1);
+        info.turnoActual = (info.turnoActual + 1) % info.jugadores.length;
+    } while (!info.jugadores[info.turnoActual].vivo && vivos.length > 1);
 
-    informacionSala.tiempo = 10;
-    informacionSala.silaba = generarDosLetras();
+    info.tiempo = 10;
+    info.silaba = generarDosLetras();
     enviarEstadoLimpio(io, sala); 
 };
 
-
 export const penalizarTiempo = (io, sala) => {
-    const informacionSala = estadosSalas[sala];
-    if (!informacionSala || !informacionSala.enJuego) return;
+    const info = estadosSalas[sala];
+    if (!info) return;
+    info.tiempo--;
+    if (info.tiempo < 0) info.tiempo = 0; // Para que no salgan números negativos
+    // Se envía el estado para que los jugadores vean el salto en el temporizador
+    enviarEstadoLimpio(io, sala);
+};
 
-    informacionSala.tiempo--;
-    if (informacionSala.tiempo < 0) informacionSala.tiempo = 0; // Para que no salgan números negativos
+export const reiniciarSala = (io, sala, mensajeAviso = "") => {
+    const info = estadosSalas[sala];
+    if (!info) return;
 
-    // Enviamos el estado inmediatamente para que los jugadores vean el salto en el temporizador
+    // Se ponen todos los valores por defecto...
+    clearInterval(info.intervalo); 
+    info.intervalo = null;
+    info.enJuego = false;
+    info.preparando = false;
+    info.tiempo = 10;
+    info.silaba = "";
+    info.palabrasUsadas = [];
+    info.turnoActual = 0;
+    // Se vuelve al único jugador que hay a su estado por defecto...
+    info.jugadores[0].vidas = 2;
+    info.jugadores[0].vivo = true;
+    // Se envía la información al log y el estado.
+    io.to(sala).emit("evento-log", mensajeAviso);
     enviarEstadoLimpio(io, sala);
 };

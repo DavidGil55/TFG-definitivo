@@ -47,6 +47,12 @@ function unirseSala(sala) {
     const codSala = sala.toUpperCase();
     tituloSala.innerText = "SALA: " + codSala;
     const apodoJugador = prompt(`Introduce tu apodo para la sala ${codSala}:`); // Prompt molesto.
+        // Este if arregla que aunque le des al promp a la opción de cancelar aún te envía a la sala.
+        // Ahora si le das a cancel sin haber puesto un nombre, te envía al lobby.
+        if (apodoJugador === null) {
+            window.location.href = "/"; 
+            return; 
+        }
     console.log(`Uniéndose a sala: ${codSala}...`);
     // Este paquete luego será recibido por sockets.mjs en la línea ~9, y se leerá el código de la sala.
     socket.emit("unirse-sala", codSala, apodoJugador, modoJuego); 
@@ -116,44 +122,43 @@ socket.on("estado-juego", estado => {
     // 3. Dibujar círculo de jugadores
     const jugadores = estado.jugadores;
     const nJugadores = jugadores.length; //numeroJugadores...
+    contenedorJugadores.innerHTML = "";
 
-    if (contenedorJugadores) contenedorJugadores.innerHTML = "";
-
-    const radius = 250; // Radio del círculo
-
-    jugadores.forEach((jugador, index) => {
+    jugadores.forEach((jugador, indice) => {
         // Matemáticas para repartir en círculo
-        const anguloRad = (index / nJugadores) * (2 * Math.PI) - (Math.PI / 2);
+        const radius = 250; // Radio del círculo
+        const anguloRad = (indice / nJugadores) * (Math.PI / 2) - (Math.PI / 2);
         const x = Math.cos(anguloRad) * radius;
         const y = Math.sin(anguloRad) * radius;
 
-        const playerCardDiv = document.createElement("div");
-        playerCardDiv.className = "jugador-card";
+        const tarjetaJugador = document.createElement("div");
+        tarjetaJugador.className = "tarjetaJugador";
 
         // Clases del CSS para el turno activo y si el jugador está muerto
-        if (estado.enJuego && index === estado.turnoActual && jugador.vivo) {
-            playerCardDiv.classList.add("turno-activo");
+        if (estado.enJuego && indice === estado.turnoActual && jugador.vivo) {
+            tarjetaJugador.classList.add("turnoActivo");
         }
         if (!jugador.vivo) {
-            playerCardDiv.classList.add("muerto");
+            tarjetaJugador.classList.add("muerto");
         }
 
         // Posicionamiento
-        playerCardDiv.style.left = `calc(50% + ${x}px)`;
-        playerCardDiv.style.top = `calc(50% + ${y}px)`;
-        playerCardDiv.style.transform = "translate(-50%, -50%)";
+        tarjetaJugador.style.left = `calc(50% + ${x}px)`;
+        tarjetaJugador.style.top = `calc(50% + ${y}px)`;
+        tarjetaJugador.style.transform = "translate(-50%, -50%)";
 
-        const esMio = jugador.id === socket.id;
+        const soyYo = jugador.id === socket.id;
         const corazones = "❤️".repeat(Math.max(0, jugador.vidas)) + "🖤".repeat(Math.max(0, 2 - jugador.vidas));
 
-        playerCardDiv.innerHTML = `
-            <div class="jugador-icono">👤</div>
-            <div class="jugador-info">
-                <div class="jugador-nombre">${jugador.nombre} ${esMio ? "(TÚ)" : ""}</div> 
-                <div class="jugador-vidas">${corazones}</div>
+        tarjetaJugador.innerHTML = `
+            <div class="jugadorIcono">👤</div>
+            <div class="jugadorInfo">
+                <div class="jugadorNombre">${jugador.nombre} ${soyYo ? "(TÚ)" : ""}</div> 
+                <div class="jugadorVidas">${corazones}</div>
             </div>
         `;
-        if (contenedorJugadores) contenedorJugadores.appendChild(playerCardDiv);
+        contenedorJugadores.appendChild(tarjetaJugador);
+        console.log(corazones);
     });
 
     // 4. Gestión del Input (Habilitar/Deshabilitar teclado)
