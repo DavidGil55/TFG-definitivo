@@ -26,7 +26,7 @@ app.get("/bomba/:IDSala", (req, res) => {
     else res.redirect("/");
 });
 
-// Arrancar los sockets importados
+// Se arrancan los sockets...
 configurarSockets(io);
 
 // Lanzamiento

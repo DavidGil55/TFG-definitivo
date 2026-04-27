@@ -1,15 +1,14 @@
 import { generarDosLetras } from "./diccionario.mjs";
 
-// Variables de estado globales
-export const estadosSalas = {};
+// Variable con todas las salas...
+export const objetoSalas = {};
 // El escaparate para ver las salas públicas que hay disponibles
 export const infoPublicaSalas = {}; 
 
 export const enviarEstadoLimpio = (io, sala) => {
-    const info = estadosSalas[sala];
-    // Si no hay información de la sala actual lo detiene todo...
-    if (!info) return;
-
+    // Si no hay sala lo termina todo...
+    if (!sala) return;
+    const info = objetoSalas[sala];
     // Esto es lo que recibe el front-end.
     const estadoSeguro = {
         silaba: info.silaba,
@@ -23,7 +22,7 @@ export const enviarEstadoLimpio = (io, sala) => {
 };
 
 export const iniciarPartida = (io, sala) => {
-    const info = estadosSalas[sala];
+    const info = objetoSalas[sala];
     if (!info) return;
 
     info.enJuego = false;
@@ -42,9 +41,9 @@ export const iniciarPartida = (io, sala) => {
             enviarEstadoLimpio(io, sala);
         } else {
             clearInterval(cuentaIntervalo);
-            if (!estadosSalas[sala]) return;
+            if (!objetoSalas[sala]) return;
             
-            if (info.jugadores.length === 1) {
+            if (info.jugadores.length <= 1) {
                 detenerPartida(io, sala, "Partida detenida. Faltan jugadores...");
                 return; 
             }           
@@ -80,11 +79,11 @@ export const iniciarPartida = (io, sala) => {
 };
 
 export const siguienteTurno = (io, sala) => {
-    const info = estadosSalas[sala];
+    const info = objetoSalas[sala];
     if (!info) return;
 
     // Si solo hay una persona en la sala se detiene la partida
-    if (info.jugadores.length === 1) {
+    if (info.jugadores.length <= 1) {
         detenerPartida(io, sala, "Partida detenida. Faltan jugadores...");
         return; 
     }
@@ -112,7 +111,7 @@ export const siguienteTurno = (io, sala) => {
 };
 
 export const penalizarTiempo = (io, sala) => {
-    const info = estadosSalas[sala];
+    const info = objetoSalas[sala];
     if (!info) return;
     info.tiempo--;
     if (info.tiempo < 0) info.tiempo = 0; // Para que no salgan números negativos
@@ -121,7 +120,7 @@ export const penalizarTiempo = (io, sala) => {
 };
 
 const detenerPartida = (io, sala, mensajeAviso = "") => {
-    const info = estadosSalas[sala];
+    const info = objetoSalas[sala];
     if (!info) return;
 
     // Se ponen todos los valores por defecto...

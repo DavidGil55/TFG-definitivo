@@ -1,5 +1,5 @@
 import { diccionario } from "./diccionario.mjs";
-import { estadosSalas, infoPublicaSalas, enviarEstadoLimpio, iniciarPartida, siguienteTurno, penalizarTiempo } from "./motorBomba.mjs";
+import { objetoSalas, infoPublicaSalas, enviarEstadoLimpio, iniciarPartida, siguienteTurno, penalizarTiempo } from "./motorBomba.mjs";
 
 // Utilizar - para separar palabras.
 export function configurarSockets(io) {
@@ -14,8 +14,8 @@ export function configurarSockets(io) {
             socket.nombreUsuario = nombre || "Jugador_" + socket.id.substring(0, 3); // Si el jugador no se pone nombre, se le asigna uno genérico.
 
             // Si aún no existe la sala, se crea una con su estado inicial.
-            if (!estadosSalas[codigoSala]) {
-                estadosSalas[codigoSala] = {
+            if (!objetoSalas[codigoSala]) {
+                objetoSalas[codigoSala] = {
                     silaba: "",
                     palabrasUsadas: [],
                     jugadores: [],
@@ -28,7 +28,7 @@ export function configurarSockets(io) {
                 };
             }
 
-            const info = estadosSalas[codigoSala]; // Información de una sala específica [ XXXX ]. 
+            const info = objetoSalas[codigoSala]; // Información de una sala específica [ XXXX ]. 
 
             info.jugadores.push({ // Aquí se agrega al jugador a la sala, con su ID del socket, nombre, vidas y estado de vivo.
                 id: socket.id, 
@@ -61,7 +61,7 @@ export function configurarSockets(io) {
         // Hacer la revancha que le den almenos dos jugadores de la sala para que ocurra...
         socket.on("pedir-revancha", () => {
             const sala = socket.salaActual;
-            const info = estadosSalas[sala];
+            const info = objetoSalas[sala];
 
             if (info && !info.enJuego && !info.preparando) {
                 io.to(sala).emit("mensaje-chat", { usuario: "<span id=\"spanSistema\">SISTEMA</span>", mensaje: `¡${socket.nombreUsuario} quiere revancha! Reiniciando...` });
@@ -83,9 +83,9 @@ export function configurarSockets(io) {
         socket.on("pedir-info-sala", () => {
             // socket.salaActual = la sala actual en la que está el jugador...
             const sala = socket.salaActual;
-            if (estadosSalas[sala]) {
+            if (objetoSalas[sala]) {
                 // Los "..." crean una copia del objeto y se la guarda en infoSegura, pero el objeto original sigue intacto...
-                const infoSegura = { ...estadosSalas[sala] };
+                const infoSegura = { ...objetoSalas[sala] };
                 // No se le puede pasar el setInterval() completo porque es un objeto en sí muy grande...
                 infoSegura.intervalo = infoSegura.intervalo ? "Está en marcha..." : "Detenido";
                 socket.emit("estado-sala", infoSegura);
@@ -94,7 +94,7 @@ export function configurarSockets(io) {
 
         socket.on("enviar-palabra", (palabraSucia) => {
             const sala = socket.salaActual;
-            const info = estadosSalas[sala];
+            const info = objetoSalas[sala];
 
             // Si no hay sala, no envíes la palabra a la bomba.
             if (!info) return;
@@ -124,7 +124,7 @@ export function configurarSockets(io) {
 
         socket.on("disconnect", () => {
             const sala = socket.salaActual;
-            const info = estadosSalas[sala];
+            const info = objetoSalas[sala];
 
             if (info) {
                 const jugadorDesconectado = info.jugadores.find(jugador => jugador.id === socket.id);
@@ -138,7 +138,7 @@ export function configurarSockets(io) {
 
                 if (info.jugadores.length === 0) {
                     clearInterval(info.intervalo); 
-                    delete estadosSalas[sala];
+                    delete objetoSalas[sala];
                     delete infoPublicaSalas[sala];
                 } else {
                     if (infoPublicaSalas[sala]) infoPublicaSalas[sala].jugadores = info.jugadores.length;

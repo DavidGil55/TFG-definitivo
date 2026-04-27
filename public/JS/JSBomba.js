@@ -11,7 +11,7 @@ tituloSala = document.getElementById("codigoSala"),
 logJuego = document.getElementById("logJuego"),
 botonRevancha = document.getElementById("botonRevancha"),
 botonCambio = document.getElementById("cambioChat"),
-infoSalaEstado = document.getElementById("info-sala-estado"),
+infoSalaEstado = document.getElementById("infoSalaEstado"),
 botonSalir = document.getElementById("botonSalir");
 
 // Aquí se obtiene el código de la sala mediante el URL.
@@ -42,17 +42,24 @@ botonCambio.addEventListener("click", () => {
 
 // Unirse a la sala
 function unirseSala(sala) {
-    if (!sala) return;
+
+    if (!sala) {
+        window.location.href = "/"; 
+        return;
+    }
+
     const modoJuego =  localStorage.getItem("modo-juego").toLowerCase();
     const codSala = sala.toUpperCase();
     tituloSala.innerText = "SALA: " + codSala;
     const apodoJugador = prompt(`Introduce tu apodo para la sala ${codSala}:`); // Prompt molesto.
-        // Este if arregla que aunque le des al promp a la opción de cancelar aún te envía a la sala.
-        // Ahora si le das a cancel sin haber puesto un nombre, te envía al lobby.
-        if (apodoJugador === null) {
-            window.location.href = "/"; 
-            return; 
-        }
+
+    // Este if arregla que aunque le des al promp a la opción de cancelar aún te envía a la sala.
+    // Ahora si le das a cancel sin haber puesto un nombre, te envía al lobby.
+    if (apodoJugador === null) {
+        window.location.href = "/"; 
+        return; 
+    }
+
     console.log(`Uniéndose a sala: ${codSala}...`);
     // Este paquete luego será recibido por sockets.mjs en la línea ~9, y se leerá el código de la sala.
     socket.emit("unirse-sala", codSala, apodoJugador, modoJuego); 
@@ -67,7 +74,7 @@ botonSalir.addEventListener("click", () => {
     socket.disconnect(); 
 });
 
-// --- EVENTOS DEL JUGADOR ---
+// EVENTOS DE JUGADOR
 
 // Enviar mensaje de chat
 inputChat.addEventListener("keydown", evento => {
@@ -97,10 +104,10 @@ if (botonRevancha) {
     });
 }
 
-// --- ACTUALIZACIONES DEL SERVIDOR ---
+// ACTUALIZACIONES DEL SERVIDOR 
 
 socket.on("estado-juego", estado => {
-    // 1. Temporizador
+    // El temporizador
     if (contadorCentral) {
         if (estado.enJuego || estado.preparando) {
             contadorCentral.innerText = estado.preparando ? "Esperando..." : estado.tiempo;
@@ -110,7 +117,7 @@ socket.on("estado-juego", estado => {
         }
     }
 
-    // 2. Sílaba
+    // Las letras de la bomba
     if (textoSilaba) {
         if (estado.enJuego || estado.preparando) {
             textoSilaba.innerText = estado.silaba.toUpperCase();
@@ -119,20 +126,29 @@ socket.on("estado-juego", estado => {
         }
     }
 
-    // 3. Dibujar círculo de jugadores
+    // El círculo de los jugadores
     const jugadores = estado.jugadores;
-    const nJugadores = jugadores.length; //numeroJugadores...
+    const nJugadores = jugadores.length;
     contenedorJugadores.innerHTML = "";
 
-    jugadores.forEach((jugador, indice) => {
-        // Matemáticas para repartir en círculo
-        const radius = 250; // Radio del círculo
-        const anguloRad = (indice / nJugadores) * (Math.PI / 2) - (Math.PI / 2);
-        const x = Math.cos(anguloRad) * radius;
-        const y = Math.sin(anguloRad) * radius;
+        jugadores.forEach((jugador, indice) => {
 
         const tarjetaJugador = document.createElement("div");
         tarjetaJugador.className = "tarjetaJugador";
+
+        const radio = 250; // Si se pone 360 el primer jugador empieza en la derecha...
+        const gradosJugador = 360 / nJugadores;
+        const grados = indice * gradosJugador; 
+        // Se pasa de grados a radianes.
+        const radianes = (grados * Math.PI / 180) - (Math.PI / 2);
+
+        const x = Math.cos(radianes) * radio;
+        const y = Math.sin(radianes) * radio;
+
+        // Posicionamiento de la tarjeta
+        tarjetaJugador.style.left = `calc(50% + ${x}px)`;
+        tarjetaJugador.style.top = `calc(50% + ${y}px)`;
+        tarjetaJugador.style.transform = "translate(-50%, -50%)";
 
         // Clases del CSS para el turno activo y si el jugador está muerto
         if (estado.enJuego && indice === estado.indiceTurno && jugador.vivo) {
@@ -141,11 +157,6 @@ socket.on("estado-juego", estado => {
         if (!jugador.vivo) {
             tarjetaJugador.classList.add("muerto");
         }
-
-        // Posicionamiento
-        tarjetaJugador.style.left = `calc(50% + ${x}px)`;
-        tarjetaJugador.style.top = `calc(50% + ${y}px)`;
-        tarjetaJugador.style.transform = "translate(-50%, -50%)";
 
         const soyYo = jugador.id === socket.id;
         const corazones = "❤️".repeat(Math.max(0, jugador.vidas)) + "🖤".repeat(Math.max(0, 2 - jugador.vidas));
@@ -158,10 +169,9 @@ socket.on("estado-juego", estado => {
             </div>
         `;
         contenedorJugadores.appendChild(tarjetaJugador);
-        console.log(corazones);
     });
 
-    // 4. Gestión del Input (Habilitar/Deshabilitar teclado)
+    // Gestión de las palabras enviadas a la bomba
     if (inputPalabra) {
         if (estado.enJuego && !estado.preparando && nJugadores > 0) {
             const jugadorTurno = jugadores[estado.indiceTurno];
@@ -188,7 +198,7 @@ socket.on("estado-juego", estado => {
         }
     }
 
-    // 5. Mostrar/Ocultar botón de Revancha
+    // Botón de revancha
     const jugadoresVivos = jugadores.filter(jugador => jugador.vivo).length;
     if (botonRevancha) {
         if (!estado.enJuego && !estado.preparando && nJugadores > 1 && jugadoresVivos <= 1) {
@@ -223,6 +233,6 @@ socket.on("error-palabra", mensaje => {
 
 socket.on("estado-sala", (objetoSala) => {
     if (!infoSalaEstado) return;
-        // Se formatea el .json para que se vea como en la terminal... 
+        // Se formatea el .json para que se vea como vería en una terminal... 
         infoSalaEstado.textContent = JSON.stringify(objetoSala, null, 4);
 });
