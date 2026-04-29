@@ -30,7 +30,7 @@ export function configurarSockets(io) {
 
             const info = objetoSalas[codigoSala]; // Información de una sala específica [ XXXX ]. 
 
-            info.jugadores.push({ // Aquí se agrega al jugador a la sala, con su ID del socket, nombre, vidas y estado de vivo.
+            info.jugadores.push({ // Aquí se agrega al jugador a la sala...
                 id: socket.id, 
                 nombre: socket.nombreUsuario, 
                 vidas: 2, 
@@ -84,15 +84,15 @@ export function configurarSockets(io) {
             // socket.salaActual = la sala actual en la que está el jugador...
             const sala = socket.salaActual;
             if (objetoSalas[sala]) {
-                // Los "..." crean una copia del objeto y se la guarda en infoSegura, pero el objeto original sigue intacto...
-                const infoSegura = { ...objetoSalas[sala] };
+                // Los "..." crean una copia del objeto y se la guarda en copiaInfo, pero el objeto original sigue intacto.
+                const copiaInfo = { ...objetoSalas[sala] };
                 // No se le puede pasar el setInterval() completo porque es un objeto en sí muy grande...
-                infoSegura.intervalo = infoSegura.intervalo ? "Está en marcha..." : "Detenido";
-                socket.emit("estado-sala", infoSegura);
+                copiaInfo.intervalo = copiaInfo.intervalo ? "Está en marcha..." : "Detenido";
+                socket.emit("estado-sala", copiaInfo);
             }
         });
 
-        socket.on("enviar-palabra", (palabraSucia) => {
+        socket.on("enviar-palabra", palabraSucia => {
             const sala = socket.salaActual;
             const info = objetoSalas[sala];
 
@@ -113,19 +113,20 @@ export function configurarSockets(io) {
             // Si la palabra es correcta...
             if (palabraLimpia.includes(info.silaba.toLowerCase()) && diccionario.has(palabraLimpia)) {
                 info.palabrasUsadas.push(palabraLimpia);
-                io.to(sala).emit("evento-log", `Palabra correcta ${socket.nombreUsuario}: ${palabraLimpia}`);
+                io.to(sala).emit("evento-log", `La palabra es correcta ${socket.nombreUsuario}: ${palabraLimpia}!`);
                 siguienteTurno(io, sala); 
                 return;
             }
             // Si la palabra es incorrecta o se la ha inventado...
                 penalizarTiempo(io, sala); 
-                socket.emit("error-palabra", "Palabra no válida");
+                socket.emit("error-palabra", "La palabra no es válida!");
         });
 
         socket.on("disconnect", () => {
             const sala = socket.salaActual;
             const info = objetoSalas[sala];
 
+            // Este if es por si el jugador nunca se unió a una sala y se desconectó.
             if (info) {
                 const jugadorDesconectado = info.jugadores.find(jugador => jugador.id === socket.id);
                 if (jugadorDesconectado) {
@@ -141,11 +142,13 @@ export function configurarSockets(io) {
                     delete objetoSalas[sala];
                     delete infoPublicaSalas[sala];
                 } else {
-                    if (infoPublicaSalas[sala]) infoPublicaSalas[sala].jugadores = info.jugadores.length;
+                    // Se actualiza la lista de jugadores
+                    infoPublicaSalas[sala].jugadores = info.jugadores.length;
 
                     const jugadoresVivos = info.jugadores.filter(jugador => jugador.vivo).length;
                     if (info.enJuego && jugadoresVivos <= 1) {
                         siguienteTurno(io, sala);
+                        // Si se desconecta el jugador al que le tocaba, se le pasa el turno al siguiente jugador vivo.
                     } else if (info.indiceTurno >= info.jugadores.length) {
                         info.indiceTurno = 0;
                     }

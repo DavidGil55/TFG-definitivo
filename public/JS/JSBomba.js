@@ -2,41 +2,41 @@ const socket = io();
 
 // Elementos del HTML
 const contadorCentral = document.getElementById("temporizador"),
-textoSilaba = document.getElementById("silaba"),
-contenedorJugadores = document.getElementById("contenedorJugadores"),
-inputPalabra = document.getElementById("inputPalabra"),
-inputChat = document.getElementById("inputChat"),
-mensajesChat = document.getElementById("mensajesChat"),
-tituloSala = document.getElementById("codigoSala"),
-logJuego = document.getElementById("logJuego"),
-botonRevancha = document.getElementById("botonRevancha"),
-botonCambio = document.getElementById("cambioChat"),
-infoSalaEstado = document.getElementById("infoSalaEstado"),
-botonSalir = document.getElementById("botonSalir");
+    textoSilaba = document.getElementById("silaba"),
+    contenedorJugadores = document.getElementById("contenedorJugadores"),
+    inputPalabra = document.getElementById("inputPalabra"),
+    inputChat = document.getElementById("inputChat"),
+    mensajesChat = document.getElementById("mensajesChat"),
+    tituloSala = document.getElementById("codigoSala"),
+    logJuego = document.getElementById("logJuego"),
+    botonRevancha = document.getElementById("botonRevancha"),
+    botonCambio = document.getElementById("cambioChat"),
+    infoSalaEstado = document.getElementById("infoSalaEstado"),
+    botonSalir = document.getElementById("botonSalir");
 
 // Aquí se obtiene el código de la sala mediante el URL.
 const parametrosURL = new URLSearchParams(window.location.search);
 const codigoSala = parametrosURL.get("sala");
 
-let pedirInfo = ""; 
+let pedirInfo = "";
 botonCambio.addEventListener("click", () => {
     if (mensajesChat.style.display !== "none") {
         mensajesChat.style.display = "none";
         infoSalaEstado.style.display = "block";
         botonCambio.innerText = "Volver al chat"
-        inputChat.style.display = "none"; 
+        inputChat.style.display = "none";
 
         pedirInfo = setInterval(() => {
             socket.emit("pedir-info-sala");
         }, 500);
         return;
-    } 
+    }
     mensajesChat.style.display = "block";
     infoSalaEstado.style.display = "none";
-    inputChat.style.display = "block"; 
+    inputChat.style.display = "block";
     botonCambio.innerText = "Ver información de la sala";
     clearInterval(pedirInfo);
-    pedirInfo = ""; 
+    pedirInfo = "";
 });
 
 
@@ -44,11 +44,11 @@ botonCambio.addEventListener("click", () => {
 function unirseSala(sala) {
 
     if (!sala) {
-        window.location.href = "/"; 
+        window.location.href = "/";
         return;
     }
 
-    const modoJuego =  localStorage.getItem("modo-juego").toLowerCase();
+    const modoJuego = localStorage.getItem("modo-juego").toLowerCase();
     const codSala = sala.toUpperCase();
     tituloSala.innerText = "SALA: " + codSala;
     const apodoJugador = prompt(`Introduce tu apodo para la sala ${codSala}:`); // Prompt molesto.
@@ -56,13 +56,13 @@ function unirseSala(sala) {
     // Este if arregla que aunque le des al promp a la opción de cancelar aún te envía a la sala.
     // Ahora si le das a cancel sin haber puesto un nombre, te envía al lobby.
     if (apodoJugador === null) {
-        window.location.href = "/"; 
-        return; 
+        window.location.href = "/";
+        return;
     }
 
     console.log(`Uniéndose a sala: ${codSala}...`);
     // Este paquete luego será recibido por sockets.mjs en la línea ~9, y se leerá el código de la sala.
-    socket.emit("unirse-sala", codSala, apodoJugador, modoJuego); 
+    socket.emit("unirse-sala", codSala, apodoJugador, modoJuego);
 }
 
 unirseSala(codigoSala);
@@ -71,7 +71,7 @@ unirseSala(codigoSala);
 botonSalir.addEventListener("click", () => {
     window.location.href = "/";
     // Esto es un poco inútil... 
-    socket.disconnect(); 
+    socket.disconnect();
 });
 
 // EVENTOS DE JUGADOR
@@ -81,7 +81,7 @@ inputChat.addEventListener("keydown", evento => {
     if (evento.key === "Enter" && inputChat.value.trim() !== "") {
         socket.emit("enviar-chat", inputChat.value);
         inputChat.value = "";
-    }    
+    }
 });
 
 
@@ -131,14 +131,14 @@ socket.on("estado-juego", estado => {
     const nJugadores = jugadores.length;
     contenedorJugadores.innerHTML = "";
 
-        jugadores.forEach((jugador, indice) => {
+    jugadores.forEach((jugador, indice) => {
 
         const tarjetaJugador = document.createElement("div");
         tarjetaJugador.className = "tarjetaJugador";
 
         const radio = 250; // Si se pone 360 el primer jugador empieza en la derecha...
         const gradosJugador = 360 / nJugadores;
-        const grados = indice * gradosJugador; 
+        const grados = indice * gradosJugador;
         // Se pasa de grados a radianes.
         const radianes = (grados * Math.PI / 180) - (Math.PI / 2);
 
@@ -172,46 +172,45 @@ socket.on("estado-juego", estado => {
     });
 
     // Gestión de las palabras enviadas a la bomba
-    if (inputPalabra) {
-        if (estado.enJuego && !estado.preparando && nJugadores > 0) {
-            const jugadorTurno = jugadores[estado.indiceTurno];
-            const esMiTurno = jugadorTurno && (jugadorTurno.id === socket.id) && jugadorTurno.vivo;
 
-            inputPalabra.disabled = !esMiTurno;
+    if (estado.enJuego && !estado.preparando && nJugadores > 0) {
+        const jugadorTurno = jugadores[estado.indiceTurno];
+        const esMiTurno = jugadorTurno && (jugadorTurno.id === socket.id) && jugadorTurno.vivo;
 
-            if (esMiTurno) {
-                inputPalabra.placeholder = "¡TU TURNO! Escribe...";
-                // Evitamos robarle el focus si está escribiendo en el chat
-                if (document.activeElement !== inputChat) {
-                    inputPalabra.focus();
-                }
-            } else {
-                inputPalabra.placeholder = "Espera tu turno...";
+        inputPalabra.disabled = !esMiTurno;
+
+        if (esMiTurno) {
+            inputPalabra.placeholder = "¡TU TURNO! Escribe...";
+            // Evitamos robarle el focus si está escribiendo en el chat
+            if (document.activeElement !== inputChat) {
+                inputPalabra.focus();
             }
         } else {
-            inputPalabra.disabled = true;
-            if (estado.preparando) {
-                inputPalabra.placeholder = "¡Prepárate!...";
-            } else {
-                inputPalabra.placeholder = "Esperando jugadores...";
-            }
+            inputPalabra.placeholder = "Espera tu turno...";
+        }
+    } else {
+        inputPalabra.disabled = true;
+        if (estado.preparando) {
+            inputPalabra.placeholder = "¡Prepárate!...";
+        } else {
+            inputPalabra.placeholder = "Esperando jugadores...";
         }
     }
+
 
     // Botón de revancha
     const jugadoresVivos = jugadores.filter(jugador => jugador.vivo).length;
-    if (botonRevancha) {
-        if (!estado.enJuego && !estado.preparando && nJugadores > 1 && jugadoresVivos <= 1) {
-            botonRevancha.style.display = "block";
-        } else {
-            botonRevancha.style.display = "none";
-        }
+
+    if (!estado.enJuego && !estado.preparando && nJugadores > 1 && jugadoresVivos <= 1) {
+        botonRevancha.style.display = "block";
+    } else {
+        botonRevancha.style.display = "none";
     }
+
 });
 
 // Eventos del chat y logs...
 socket.on("mensaje-chat", objetoMensaje => {
-    if (!mensajesChat) return;
     const mensaje = document.createElement("div");
     mensaje.innerHTML = `<b>${objetoMensaje.usuario}:</b> ${objetoMensaje.mensaje}`;
     mensajesChat.appendChild(mensaje);
@@ -219,20 +218,18 @@ socket.on("mensaje-chat", objetoMensaje => {
 });
 
 socket.on("evento-log", mensaje => {
-    if (!logJuego) return; 
     logJuego.innerText = mensaje;
 });
 
 socket.on("error-palabra", mensaje => {
-    if (!inputPalabra) return;
     inputPalabra.style.borderColor = "red";
     setTimeout(() => {
         inputPalabra.style.borderColor = "#3a3f4b";
     }, 500);
 });
 
-socket.on("estado-sala", (objetoSala) => {
+socket.on("estado-sala", objetoSala => {
     if (!infoSalaEstado) return;
-        // Se formatea el .json para que se vea como vería en una terminal... 
-        infoSalaEstado.textContent = JSON.stringify(objetoSala, null, 4);
+    // Se formatea el .json para que se vea como vería en una terminal... 
+    infoSalaEstado.textContent = JSON.stringify(objetoSala, null, 4);
 });
