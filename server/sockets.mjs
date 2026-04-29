@@ -1,5 +1,5 @@
 import { diccionario } from "./diccionario.mjs";
-import { objetoSalas, infoPublicaSalas, enviarEstadoLimpio, iniciarPartida, siguienteTurno, penalizarTiempo } from "./motorBomba.mjs";
+import { objetoSalas, infoPublicaSalas, enviarInfoPublicaJugadores, iniciarPartida, siguienteTurno, penalizarTiempo } from "./motorBomba.mjs";
 
 // Utilizar - para separar palabras.
 export function configurarSockets(io) {
@@ -19,6 +19,7 @@ export function configurarSockets(io) {
                     silaba: "",
                     palabrasUsadas: [],
                     jugadores: [],
+                    votosRevancha: [],
                     indiceTurno: 0,
                     tiempo: 10,
                     enJuego: false,
@@ -55,7 +56,7 @@ export function configurarSockets(io) {
                 // El return sirve para terminar la ejecuión de la función.
                 return iniciarPartida(io, codigoSala);
             } 
-            enviarEstadoLimpio(io, codigoSala);
+            enviarInfoPublicaJugadores(io, codigoSala);
         });
 
         // Hacer la revancha que le den almenos dos jugadores de la sala para que ocurra...
@@ -63,11 +64,33 @@ export function configurarSockets(io) {
             const sala = socket.salaActual;
             const info = objetoSalas[sala];
 
-            if (info && !info.enJuego && !info.preparando) {
-                io.to(sala).emit("mensaje-chat", { usuario: "<span id=\"spanSistema\">SISTEMA</span>", mensaje: `¡${socket.nombreUsuario} quiere revancha! Reiniciando...` });
-                info.jugadores.forEach(jugador => { jugador.vidas = 2; jugador.vivo = true; });
-                info.palabrasUsadas = [];
-                iniciarPartida(io, sala);
+            if (!info.enJuego && !info.preparando) {
+                if (!info.votosRevancha.includes(socket.id)) {
+                    // Se agrega el ID del jugador que vota por la revancha.
+                    info.votosRevancha.push(socket.id);
+                    const votosActuales = info.votosRevancha.length;
+                    // Math.ceil calcula la mitad de los jugadores hacia arriba, y el Math.max hace que como mínimo se necesiten 2 votos para la revancha...
+                    const votosNecesarios = Math.max(2, Math.ceil(info.jugadores.length / 2));
+
+                    io.to(sala).emit("mensaje-chat", { 
+                        usuario: "<span id=\"spanSistema\">SISTEMA</span>", 
+                        mensaje: `${socket.nombreUsuario} quiere revancha! (${votosActuales}/${votosNecesarios})` 
+                    });
+                    
+                    // Si se llega a los votos necesarios:
+                    if (votosActuales >= votosNecesarios) {
+                        io.to(sala).emit("mensaje-chat", { 
+                            usuario: "<span id=\"spanSistema\">SISTEMA</span>", 
+                            mensaje: `Se hace revancha! Reiniciando la bomba...` 
+                        });
+                        
+                        // Se reinicia la sala para la revancha...
+                        info.votosRevancha = []; 
+                        info.jugadores.forEach(jugador => { jugador.vidas = 2; jugador.vivo = true; });
+                        info.palabrasUsadas = [];
+                        iniciarPartida(io, sala);
+                    }
+                }
             }
         });
 
@@ -153,7 +176,7 @@ export function configurarSockets(io) {
                         info.indiceTurno = 0;
                     }
 
-                    enviarEstadoLimpio(io, sala);
+                    enviarInfoPublicaJugadores(io, sala);
                     io.to(sala).emit("evento-log", `${socket.nombreUsuario} se desconectó...`);
                 }
                 io.emit("lista-salas-actualizada", Object.values(infoPublicaSalas));

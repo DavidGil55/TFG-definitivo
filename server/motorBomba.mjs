@@ -5,7 +5,8 @@ export const objetoSalas = {};
 // El escaparate para ver las salas públicas que hay disponibles
 export const infoPublicaSalas = {}; 
 
-export const enviarEstadoLimpio = (io, sala) => {
+//enviarInfoPublicaJugadores a los jugadores. 
+export const enviarInfoPublicaJugadores = (io, sala) => {
     // Si no hay sala lo termina todo...
     if (!sala) return;
     const info = objetoSalas[sala];
@@ -29,16 +30,16 @@ export const iniciarPartida = (io, sala) => {
     info.preparando = true;
     io.to(sala).emit("evento-log", "¡Preparados...");
 
-    let cuentraAtras = 5;
+    let cuentraAtras = 10;
     // Esto hace que se muestre la cuenta atrás dentro de la bomba.
     info.silaba = cuentraAtras.toString();
-    enviarEstadoLimpio(io, sala);
+    enviarInfoPublicaJugadores(io, sala);
 
     const cuentaIntervalo = setInterval(() => {
         cuentraAtras--;
         if (cuentraAtras > 0) {
             info.silaba = cuentraAtras.toString();
-            enviarEstadoLimpio(io, sala);
+            enviarInfoPublicaJugadores(io, sala);
         } else {
             clearInterval(cuentaIntervalo);
             if (!objetoSalas[sala]) return;
@@ -70,10 +71,10 @@ export const iniciarPartida = (io, sala) => {
                     }
                     siguienteTurno(io, sala);
                 } else {
-                    enviarEstadoLimpio(io, sala);
+                    enviarInfoPublicaJugadores(io, sala);
                 }
             }, 1000);
-            enviarEstadoLimpio(io, sala);
+            enviarInfoPublicaJugadores(io, sala);
         }
     }, 1000);
 };
@@ -95,7 +96,7 @@ export const siguienteTurno = (io, sala) => {
         info.enJuego = false;
         const ganador = jugadoresVivos[0].nombre;
         io.to(sala).emit("evento-log", `${ganador} HA GANADO LA PARTIDA!`);
-        enviarEstadoLimpio(io, sala); 
+        enviarInfoPublicaJugadores(io, sala); 
         return;
     }
 
@@ -107,16 +108,15 @@ export const siguienteTurno = (io, sala) => {
     // Se reinicia la sala...
     info.tiempo = 10;
     info.silaba = generarDosLetras();
-    enviarEstadoLimpio(io, sala); 
+    enviarInfoPublicaJugadores(io, sala); 
 };
 
 export const penalizarTiempo = (io, sala) => {
     const info = objetoSalas[sala];
-    if (!info) return;
     info.tiempo--;
     if (info.tiempo < 0) info.tiempo = 0; // Para que no salgan números negativos
     // Se envía el estado para que los jugadores vean el salto en el temporizador
-    enviarEstadoLimpio(io, sala);
+    enviarInfoPublicaJugadores(io, sala);
 };
 
 const detenerPartida = (io, sala, mensajeAviso = "") => {
@@ -131,6 +131,7 @@ const detenerPartida = (io, sala, mensajeAviso = "") => {
     info.tiempo = 10;
     info.silaba = "";
     info.palabrasUsadas = [];
+    info.votosRevancha = [];
     info.indiceTurno = 0;
 
     // Se vuelve al único jugador que hay a su estado por defecto...
@@ -139,5 +140,5 @@ const detenerPartida = (io, sala, mensajeAviso = "") => {
 
     // Se envía la información al log y el estado.
     io.to(sala).emit("evento-log", mensajeAviso);
-    enviarEstadoLimpio(io, sala);
+    enviarInfoPublicaJugadores(io, sala);
 };

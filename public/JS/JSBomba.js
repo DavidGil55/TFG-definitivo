@@ -35,7 +35,7 @@ botonCambio.addEventListener("click", () => {
     infoSalaEstado.style.display = "none";
     inputChat.style.display = "block";
     botonCambio.innerText = "Ver información de la sala";
-    clearInterval(pedirInfo);
+    clearInterval(pedirInfo); // Se detiene las peticions de información.
     pedirInfo = "";
 });
 
@@ -100,12 +100,15 @@ inputPalabra.addEventListener("keydown", evento => {
 if (botonRevancha) {
     botonRevancha.addEventListener("click", () => {
         socket.emit("pedir-revancha");
-        botonRevancha.style.display = "none";
+        
+        // Se cambia el texto para que se sepa que se ha pedido la revancha.
+        botonRevancha.innerText = "ESPERANDO A OTRO JUGADOR...";
+        botonRevancha.disabled = true; 
+        botonRevancha.classList.add("botonDesactivado"); 
     });
 }
 
 // ACTUALIZACIONES DEL SERVIDOR 
-
 socket.on("estado-juego", estado => {
     // El temporizador
     if (contadorCentral) {
@@ -200,13 +203,11 @@ socket.on("estado-juego", estado => {
 
     // Botón de revancha
     const jugadoresVivos = jugadores.filter(jugador => jugador.vivo).length;
-
     if (!estado.enJuego && !estado.preparando && nJugadores > 1 && jugadoresVivos <= 1) {
         botonRevancha.style.display = "block";
     } else {
         botonRevancha.style.display = "none";
     }
-
 });
 
 // Eventos del chat y logs...
