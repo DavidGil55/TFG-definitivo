@@ -43,7 +43,7 @@ botonCambio.addEventListener("click", () => {
 // Unirse a la sala
 function unirseSala(sala) {
 
-    // Esto es para evitar unirte a salas que no existen (se crearían) y crear salas que son de 4 letras.
+    // Esto es para evitar unirte a salas que no existen (se crearían) y crear salas que NO son de 4 letras.
     if (!sala || sala.length !== 4) {
         window.location.href = "/";
         return;
@@ -75,9 +75,7 @@ botonSalir.addEventListener("click", () => {
     socket.disconnect();
 });
 
-// EVENTOS DE JUGADOR
-
-// Enviar mensaje de chat
+// Enviar mensajes al chat...
 inputChat.addEventListener("keydown", evento => {
     if (evento.key === "Enter" && inputChat.value.trim() !== "") {
         socket.emit("enviar-chat", inputChat.value);
@@ -86,12 +84,12 @@ inputChat.addEventListener("keydown", evento => {
 });
 
 
-// Enviar palabra a la bomba
+// Enviarle palabras a la bomba...
 inputPalabra.addEventListener("keydown", evento => {
     if (evento.key === "Enter") {
-        const palabra = inputPalabra.value.trim().toLowerCase();
-        if (palabra.length > 0) {
-            socket.emit("enviar-palabra", palabra);
+        const palabraLimpia = inputPalabra.value.trim().toLowerCase();
+        if (palabraLimpia.length > 0) {
+            socket.emit("enviar-palabra", palabraLimpia);
             inputPalabra.value = "";
         }
     }
@@ -102,7 +100,7 @@ if (botonRevancha) {
     botonRevancha.addEventListener("click", () => {
         socket.emit("pedir-revancha");
         
-        // Se cambia el texto para que se sepa que se ha pedido la revancha.
+        // Se le cambia el texto para que se sepa que se ha pedido la revancha.
         botonRevancha.innerText = "ESPERANDO A OTRO JUGADOR...";
         botonRevancha.disabled = true; 
         botonRevancha.classList.add("botonDesactivado"); 
@@ -111,25 +109,22 @@ if (botonRevancha) {
 
 // ACTUALIZACIONES DEL SERVIDOR 
 socket.on("estado-juego", estado => {
-    // El temporizador
-    if (contadorCentral) {
-        if (estado.enJuego || estado.preparando) {
-            contadorCentral.innerText = estado.preparando ? "Esperando..." : estado.tiempo;
-        } else {
-            contadorCentral.innerText = "Esperando jugadores...";
-        }
-    }
 
-    // Las letras de la bomba
-    if (textoSilaba) {
-        if (estado.enJuego || estado.preparando) {
-            textoSilaba.innerText = estado.silaba.toUpperCase();
-        } else {
-            textoSilaba.innerText = "--";
-        }
+    // El temporizador...
+    if (estado.enJuego || estado.preparando) {
+        contadorCentral.innerText = estado.preparando ? "Esperando..." : estado.tiempo;
+    } else {
+        contadorCentral.innerText = "Esperando jugadores...";
     }
-
-    // El círculo de los jugadores
+    
+    // Las letras de la bomba...
+    if (estado.enJuego || estado.preparando) {
+        textoSilaba.innerText = estado.silaba.toUpperCase();
+    } else {
+        textoSilaba.innerText = "--";
+    }
+    
+    // El círculo de los jugadores...
     const jugadores = estado.jugadores;
     const nJugadores = jugadores.length;
     contenedorJugadores.innerHTML = "";
@@ -174,8 +169,7 @@ socket.on("estado-juego", estado => {
         contenedorJugadores.appendChild(tarjetaJugador);
     });
 
-    // Gestión de las palabras enviadas a la bomba
-
+    // La gestión de las palabras enviadas a la bomba
     if (estado.enJuego && !estado.preparando && nJugadores > 0) {
         const jugadorTurno = jugadores[estado.indiceTurno];
         const esMiTurno = jugadorTurno && (jugadorTurno.id === socket.id) && jugadorTurno.vivo;
@@ -183,15 +177,14 @@ socket.on("estado-juego", estado => {
         inputPalabra.disabled = !esMiTurno;
 
         if (esMiTurno) {
-            inputPalabra.placeholder = "TU TURNO! Escribe...";
-            // Evitamos robarle el focus si está escribiendo en el chat
-            if (document.activeElement !== inputChat) {
-                inputPalabra.focus();
-            }
+            inputPalabra.placeholder = "TU TURNO! Escribe algo...";
+            // Se le pone el focus al input para la bomba
+            inputPalabra.focus();
         } else {
             inputPalabra.placeholder = "Espera tu turno...";
         }
-    } else {
+        
+    } else { // Si no es tu turno...
         inputPalabra.disabled = true;
         if (estado.preparando) {
             inputPalabra.placeholder = "Prepárate!...";

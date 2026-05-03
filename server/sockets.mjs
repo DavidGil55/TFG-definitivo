@@ -38,6 +38,7 @@ export function configurarSockets(io) {
                 vivo: true 
             });
 
+            // Si no existe la info pública, se crea; o si ya existe se modifica cuántos jugadores hay.
             if (!infoPublicaSalas[codigoSala]) {
                 infoPublicaSalas[codigoSala] = { 
                     codigo: codigoSala, 
@@ -50,16 +51,16 @@ export function configurarSockets(io) {
             }
 
             io.emit("lista-salas-actualizada", Object.values(infoPublicaSalas));
-            io.to(codigoSala).emit("mensaje-chat", { usuario: "<span id=\"spanSistema\">SISTEMA</span>", mensaje: `${socket.nombreUsuario} se unió.` });
+            io.to(codigoSala).emit("mensaje-chat", { usuario: "<span id=\"spanSistema\">SISTEMA</span>", mensaje: `${socket.nombreUsuario} se unió!` });
 
+            // Si hay más de dos jugadores y no se está jugando, se inicia la partida.
             if (info.jugadores.length >= 2 && !info.enJuego && !info.preparando) {
-                // El return sirve para terminar la ejecuión de la función.
                 return iniciarPartida(io, codigoSala);
             } 
             enviarInfoPublicaJugadores(io, codigoSala);
         });
 
-        // Hacer la revancha que le den almenos dos jugadores de la sala para que ocurra...
+        // Hacer la revancha que le den al menos dos jugadores de la sala para que ocurra...
         socket.on("pedir-revancha", () => {
             const sala = socket.salaActual;
             const info = objetoSalas[sala];
@@ -119,7 +120,7 @@ export function configurarSockets(io) {
             const sala = socket.salaActual;
             const info = objetoSalas[sala];
 
-            // Si no hay sala, no envíes la palabra a la bomba.
+            // Si no hay sala, no le envíes la palabra a la bomba.
             if (!info) return;
 
             const turnoJugador = info.jugadores[info.indiceTurno];
@@ -145,7 +146,7 @@ export function configurarSockets(io) {
                 socket.emit("error-palabra", "La palabra no es válida!");
         });
 
-        socket.on("disconnect", () => {
+        socket.on("disconnect", () => { // El "disconnect" tampoco se puede cambiar...
             const sala = socket.salaActual;
             const info = objetoSalas[sala];
 

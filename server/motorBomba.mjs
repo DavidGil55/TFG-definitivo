@@ -28,7 +28,7 @@ export const iniciarPartida = (io, sala) => {
 
     info.enJuego = false;
     info.preparando = true;
-    io.to(sala).emit("evento-log", "¡Preparados...");
+    io.to(sala).emit("evento-log", "Preparados...");
 
     let cuentraAtras = 10;
     // Esto hace que se muestre la cuenta atrás dentro de la bomba.
@@ -56,7 +56,7 @@ export const iniciarPartida = (io, sala) => {
             info.indiceTurno = info.jugadores.findIndex(j => j.vivo);
             if(info.indiceTurno === -1) info.indiceTurno = 0;
 
-            io.to(sala).emit("evento-log", "¡A JUGAR!");
+            io.to(sala).emit("evento-log", "A JUGAR!");
             
             // Se hace un segundo intervalo, el del juego en sí...
             info.intervalo = setInterval(() => {
