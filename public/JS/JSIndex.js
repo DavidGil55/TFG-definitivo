@@ -115,7 +115,7 @@ socket.on("lista-salas-actualizada", salas => {
         divSala.innerHTML = `
         <div class="salaModo">MODO: <b>${nombreModo.toUpperCase()}</b></div> 
         <div class="codigoSala">CÓDIGO: <b>${sala.codigo}</b></div>
-        <div class="creadorSala">Sala de ${sala.creador} (${sala.jugadores} Jugadores)</div>
+        <div class="creadorSala">Sala de ${sala.creador} (${sala.jugadores} jugadores)</div>
         <button onclick="window.location.href='/${nombreModo.toLowerCase()}?sala=${sala.codigo}'" class="botonEntrar">ENTRAR</button>
         `;
         contenedor.appendChild(divSala);

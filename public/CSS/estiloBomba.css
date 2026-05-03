@@ -1,4 +1,4 @@
-/* La pantalla general */
+/* la pantalla general */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -20,7 +20,7 @@ body {
     width: 100vw;
 }
 
-/* La zona del chat */
+/* PANEL IZQUIERDO */
 #zonaChat {
     background-color: #15171c;
     border-right: 1px solid #3a3f4b;
@@ -34,17 +34,20 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding-right: 5px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top:5px;
+    padding-right:5px;
+    padding-bottom:5px;
+    padding-left:0px; 
     font-size: 0.8rem;
+    /* para que el chat sea scrolleable */
+    height: 0;
     flex-grow: 1;
+    overflow-y: auto; 
 }
 
 #mensajesChat div {
     background-color: #252932;
     padding: 10px;
-    /* Para que la palabra de la vuelta y no se salga de la pantalla.*/ 
     word-wrap: break-word; 
 }
 
@@ -62,23 +65,55 @@ body {
     border-color: #00f2ff;
 }
 
-/* El área de juego */
-#areaJuego {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding-top: 20px;    
-    padding-bottom: 20px; 
-    padding-right: 40px;  
-    padding-left: 40px;   
-    background-color: #1a1c22; 
-    position: relative;
+#infoSalaEstado {
+    background-color: #1e1e1e;
+    color: #4af626;
+    padding: 5px;
+    font-family: monospace;
+    white-space: pre-wrap; 
+    display: none;
+    height: 0;
+    flex-grow: 1;
+    overflow-y: auto; 
 }
 
+#cambioChat {
+    background-color: #1d212c;
+    border: 1px solid #47577c;
+    color: white;
+    padding: 12px;
+    outline: none;
+    font-size: 1rem;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+#cambioChat:hover {
+    background-color: #2a3040;
+}
+
+#spanSistema {
+    font-weight: bold;
+    color: #ff0055;
+}
+
+/* PANEL DERECHO */
+main {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #1a1c22; 
+}
+
+/* cabecera */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-top:20px;
+    padding-right:40px;
+    padding-bottom:20px;
+    padding-left:40px; 
     z-index: 20;
 }
 
@@ -87,30 +122,18 @@ header {
     background-color: transparent;
     border: 1px solid #3a3f4b;
     color: white;
-    padding-top: 8px;
-    padding-right: 15px;
-    padding-bottom: 8px;
-    padding-left: 15px;
+    padding-top:8px;
+    padding-right:15px;
+    padding-bottom:8px;
+    padding-left:15px; 
     cursor: pointer;
     transition: 0.2s;
 }
 
-#botonRevancha {
-    display: none; 
-    background-color: #00f2ff; 
-    color: #000; 
-    font-weight: bold; 
-    margin-bottom: 10px;
-}
-
-#botonSalir:hover, #botonRevancha:hover {
-    background-color: #ff0055;
-    border-color: #ff0055;
-}
-
+/* la zona del arenaJuego */
 #areaJuego {
     position: relative; 
-    flex-grow: 1;
+    flex-grow: 1; 
     display: flex;
     align-items: center;
     justify-content: center; 
@@ -122,10 +145,11 @@ header {
     top: 20px; 
     left: 50%;
     transform: translateX(-50%); 
-    font-size: 5rem;
+    font-size: 2rem;
     font-weight: bold;
     color: #ff3366; 
     z-index: 10;
+    text-align: center; 
 }
 
 #divBomba {
@@ -155,6 +179,7 @@ header {
     letter-spacing: 2px;
 }
 
+/* todo lo relacionado con los jugadores */
 #contenedorJugadores {
     position: absolute; 
     width: 100%;
@@ -190,10 +215,10 @@ header {
 .jugadorInfo {
     text-align: center;
     background-color: rgba(0,0,0,0.7);
-    padding-top: 5px;
-    padding-right: 12px;
-    padding-bottom: 5px;
-    padding-left: 12px;
+    padding-top:5px;
+    padding-right:12px;
+    padding-bottom:5px;
+    padding-left:12px; 
 }
 
 .jugadorNombre {
@@ -230,15 +255,41 @@ header {
     color: #888;
 }
 
-/* Los controles inferiores */
+/* controles */
 #controlesInferiores {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 15px;
-    margin-bottom: 20px;
+    padding-top:0px;
+    padding-right:40px ;
+    padding-bottom:30px ;
+    padding-left:40px; 
     z-index: 20;
     width: 100%;
+    min-height: 130px; 
+}
+
+#botonRevancha {
+    display: none; 
+    background-color: #00f2ff; 
+    color: #000; 
+    font-weight: bold; 
+    padding: 10px 20px;
+    padding-top:10px;
+    padding-right:20px;
+    padding-bottom:10px;
+    padding-left:20px; 
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#botonSalir:hover, #botonRevancha:hover {
+    background-color: #ff0055;
+    border-color: #ff0055;
+    color: white;
 }
 
 #inputPalabra {
@@ -272,32 +323,118 @@ header {
     min-height: 1.5rem;
 }
 
-#spanSistema {
-    font-weight: bold;
-    color: #ff0055;
-}
+/* responsive design para móviles */
+@media (max-width: 800px) {
+    
+    #layoutJuego {
+        display: flex;
+        /* esto hace que el chat esté abajo y el juego arriba */
+        flex-direction: column-reverse; 
+    }
 
-#infoSalaEstado {
-    background-color: #1e1e1e;
-    color: #4af626;
-    padding: 5px;
-    font-family: monospace;
-    white-space: pre-wrap; 
-    flex-grow: 1;
-    display: none;
-}
+    main {
+        flex: 2; /* hace que el juego ocupe el doble de espacio que el chat */
+        height: auto;
+    }
 
-#cambioChat {
-    background-color: #1d212c;
-    border: 1px solid #47577c;
-    color: white;
-    padding: 12px;
-    outline: none;
-    font-size: 1rem;
-    transition: 0.3s;
-    cursor: pointer;
-}
+    #zonaChat {
+        flex: 1;
+        width: 100%;
+        border-right: none;
+        border-top: 2px solid #3a3f4b;
+        padding: 10px;
+    }
 
-#cambioChat:hover {
-    background-color: #2a3040;
+    header {
+        padding: 10px 15px;
+        z-index: 30;
+    }
+
+    #codigoSala {
+        font-size: 1.2rem; 
+    }
+
+    #botonSalir {
+        padding: 6px 12px;
+        font-size: 0.8rem; 
+    }
+
+    
+    #areaJuego {
+        margin-top: 15px; 
+    }
+
+    #controlesInferiores {
+        padding: 0 15px 15px 15px;
+        min-height: auto; 
+        gap: 10px;
+    }
+
+    /* se hace más pequeño el texto del temporizador */
+    #temporizador {
+        font-size: 1rem; 
+        top: 0px; 
+        width: 100%;  
+        padding: 0 10px;
+    }
+
+    #divBomba {
+        width: 130px; 
+        height: 130px;
+        margin-top: 100px;
+    }
+
+    #silaba {
+        font-size: 2rem;
+    }
+
+    #inputPalabra {
+        font-size: 1.2rem;
+        padding: 10px;
+    }
+
+    .jugadorIcono {
+        width: 45px;
+        height: 45px;
+        font-size: 1.5rem;
+        border-width: 1px;
+    }
+
+    .jugadorInfo {
+        padding: 2px 6px;
+    }
+
+    .jugadorNombre {
+        font-size: 0.75rem;
+    }
+
+    .jugadorVidas {
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        margin-top: 1px;
+    }
+
+    #logJuego {
+        font-size: 0.9rem;
+    }
+
+    /* se ponen a los jugadores en línea, porque en círculo se ve horrible */
+    #contenedorJugadores {
+        display: flex;
+        flex-direction: row; 
+        flex-wrap: wrap; 
+        justify-content: center; 
+        align-items: flex-start;
+        padding-top: 50px; 
+        gap: 15px; 
+    }
+
+    .tarjetaJugador {
+        /* sin el importart se arruina todo */
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important; 
+    }
+
 }

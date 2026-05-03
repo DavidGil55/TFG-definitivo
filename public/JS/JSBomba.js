@@ -43,7 +43,8 @@ botonCambio.addEventListener("click", () => {
 // Unirse a la sala
 function unirseSala(sala) {
 
-    if (!sala) {
+    // Esto es para evitar unirte a salas que no existen (se crearían) y crear salas que son de 4 letras.
+    if (!sala || sala.length !== 4) {
         window.location.href = "/";
         return;
     }
@@ -116,7 +117,6 @@ socket.on("estado-juego", estado => {
             contadorCentral.innerText = estado.preparando ? "Esperando..." : estado.tiempo;
         } else {
             contadorCentral.innerText = "Esperando jugadores...";
-            contadorCentral.style.fontSize = "2rem";
         }
     }
 
@@ -139,7 +139,7 @@ socket.on("estado-juego", estado => {
         const tarjetaJugador = document.createElement("div");
         tarjetaJugador.className = "tarjetaJugador";
 
-        const radio = 250; // Si se pone 360 el primer jugador empieza en la derecha...
+        const radio = 250; 
         const gradosJugador = 360 / nJugadores;
         const grados = indice * gradosJugador;
         // Se pasa de grados a radianes.
@@ -183,7 +183,7 @@ socket.on("estado-juego", estado => {
         inputPalabra.disabled = !esMiTurno;
 
         if (esMiTurno) {
-            inputPalabra.placeholder = "¡TU TURNO! Escribe...";
+            inputPalabra.placeholder = "TU TURNO! Escribe...";
             // Evitamos robarle el focus si está escribiendo en el chat
             if (document.activeElement !== inputChat) {
                 inputPalabra.focus();
@@ -194,14 +194,14 @@ socket.on("estado-juego", estado => {
     } else {
         inputPalabra.disabled = true;
         if (estado.preparando) {
-            inputPalabra.placeholder = "¡Prepárate!...";
+            inputPalabra.placeholder = "Prepárate!...";
         } else {
             inputPalabra.placeholder = "Esperando jugadores...";
         }
     }
 
 
-    // Botón de revancha
+    // Esto hace que se muestre el botón de revancha
     const jugadoresVivos = jugadores.filter(jugador => jugador.vivo).length;
     if (!estado.enJuego && !estado.preparando && nJugadores > 1 && jugadoresVivos <= 1) {
         botonRevancha.style.display = "block";
@@ -232,5 +232,6 @@ socket.on("error-palabra", mensaje => {
 socket.on("estado-sala", objetoSala => {
     if (!infoSalaEstado) return;
     // Se formatea el .json para que se vea como vería en una terminal... 
+    // Que stringifique el objeto "objetoSala", que no reemplace nada, y que tenga 4 espacios de identaicón. 
     infoSalaEstado.textContent = JSON.stringify(objetoSala, null, 4);
 });

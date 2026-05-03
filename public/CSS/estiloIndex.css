@@ -15,7 +15,7 @@ body {
     overflow: hidden;
 }
 
-/* La estructura del div princiapal */
+/* La estructura del div principal */
 .divPrincipal {
     width: 100%;
     max-width: 900px;
@@ -38,7 +38,7 @@ body {
 }
 
 .header .nombreProyecto {
-    font-size: 2.9rem;
+    font-size: 40px;
     letter-spacing: 5px;
     background: #252932;
 }
@@ -91,30 +91,34 @@ body {
     flex: 1;
     flex-shrink: 1;
     display: flex;
+    min-width: 0; 
 }
 
 .salasCreadas {
     flex: 1;
+    display: flex;
     flex-direction: column;
     justify-content: flex-start;
     padding: 20px;
     background: #15171c;
+    overflow: hidden;
 }
 
 .contenedorSalas {
     width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    padding: 10px;
+    display: grid; 
+    gap: 20px;
+    padding: 15px;
     overflow-y: auto;
+    overflow-x: hidden;
+    align-content: start;
 }
 
 .tarjetaSalaPublica {
     background: #252932;
     border: 1px solid #3a3f4b;
     padding: 15px;
-    min-width: 200px;
+    width: 100%; 
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -141,7 +145,7 @@ body {
     font-weight: bold;
 }
 
-/* El footer */
+/* el footer */
 .footer {
     height: 8%;
 }
@@ -157,31 +161,124 @@ body {
     cursor: pointer;
 }
 
-/* Cosas interactuables */
+/* cosas interactuables */
 .modoDeJuego:hover {
     background-color: #3a3f4b;
 }
 
 .modoSeleccionado {
-    background-color: #4a90e2 !important;
-    border: 2px solid #00f2ff !important;
+    background-color: #4a90e2 ;
+    border: 2px solid #00f2ff ;
     transform: scale(0.95);
 }
 
 .botonDesactivado, button:disabled {
     opacity: 0.2;
-    cursor: not-allowed !important;
+    cursor: not-allowed ;
     pointer-events: none;
     filter: grayscale(1);
     font-size: 1rem;
 }
 
 .botonActivo {
-    opacity: 1 !important;
-    cursor: pointer !important;
-    pointer-events: auto !important;
-    background-color: #4a90e2 !important;
-    border: 1px solid #00f2ff !important;
-    filter: none !important;
+    opacity: 1 ;
+    cursor: pointer ;
+    pointer-events: auto ;
+    background-color: #4a90e2 ;
+    border: 1px solid #00f2ff ;
+    filter: none ;
     font-size: 0.95rem;
+}
+
+/* responsive design para móviles */
+@media (max-width: 800px) {
+    
+    .divPrincipal {
+        max-width: 100%;
+        padding: 10px;
+    }
+
+    .header { 
+        height: auto; 
+    }
+
+    .header .nombreProyecto {
+        font-size: 1.5rem; 
+        letter-spacing: 2px; 
+        text-align: center;
+        white-space: normal; 
+    }
+
+    .zonaSeleccion, .seleccionFila, .zonaIconos, .ponerCodigo {
+        height: auto;
+        width: 100%; 
+        display: flex;
+        flex-direction: column; 
+        gap: 10px;
+    }
+
+    .divGenerico, .ponerCodigo input {
+        width: 100%;
+        padding: 12px;
+        font-size: 0.9rem;
+        box-sizing: border-box;
+    }
+
+    #salasPublicas {
+        flex-direction: column;
+        flex: 1;
+        min-height: 0; /* esto permite el scroll */
+        width: 100%;
+    }
+
+    .salasCreadas {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        padding: 10px;
+        width: 100%;
+    }
+
+    .contenedorSalas {    
+        width: 100%;
+        box-sizing: border-box;
+        flex: 1;
+        min-height: 0; 
+        overflow-y: auto;
+        overflow-x: hidden; 
+        padding: 5px;
+        padding-bottom: 40px; 
+        gap: 10px; 
+    }
+
+    .tarjetaSalaPublica {
+        width: 100%;
+        padding: 15px; 
+        gap: 2px;
+        box-sizing: border-box;
+    }
+
+    .codigoSala { 
+        font-size: 1rem; 
+    }
+
+    .creadorSala { 
+        font-size: 0.8rem; 
+    }
+
+    .botonEntrar { 
+        margin-top: 5px; 
+        padding: 8px; 
+    }
+
+    .footer {
+        order: -1; /* esto hace que el footer ahora esté arriba */
+        height: auto; 
+        padding-bottom: 5px;
+    }
+
+    .contenidoFooter {
+        font-size: 1rem;
+    }
 }

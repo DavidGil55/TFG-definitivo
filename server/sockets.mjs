@@ -149,7 +149,7 @@ export function configurarSockets(io) {
             const sala = socket.salaActual;
             const info = objetoSalas[sala];
 
-            // Este if es por si el jugador nunca se unió a una sala y se desconectó.
+            // Este if es por si el jugador se quedó en la pantalla del prompt y se desconectó.
             if (info) {
                 const jugadorDesconectado = info.jugadores.find(jugador => jugador.id === socket.id);
                 if (jugadorDesconectado) {
@@ -160,12 +160,13 @@ export function configurarSockets(io) {
                 }
                 info.jugadores = info.jugadores.filter(jugador => jugador.id !== socket.id);
 
+                // Si no existe la sala de borra del todo
                 if (info.jugadores.length === 0) {
                     clearInterval(info.intervalo); 
                     delete objetoSalas[sala];
                     delete infoPublicaSalas[sala];
                 } else {
-                    // Se actualiza la lista de jugadores
+                    // Si no se actualiza la lista de jugadores...
                     infoPublicaSalas[sala].jugadores = info.jugadores.length;
 
                     const jugadoresVivos = info.jugadores.filter(jugador => jugador.vivo).length;

@@ -58,16 +58,17 @@ export const iniciarPartida = (io, sala) => {
 
             io.to(sala).emit("evento-log", "¡A JUGAR!");
             
+            // Se hace un segundo intervalo, el del juego en sí...
             info.intervalo = setInterval(() => {
                 info.tiempo--;
                 if (info.tiempo <= 0) {
                     const jugadorActual = info.jugadores[info.indiceTurno];
                     jugadorActual.vidas--;
-                    io.to(sala).emit("evento-log", ` ¡BOOM! ${jugadorActual.nombre} pierde una vida.`);
+                    io.to(sala).emit("evento-log", `BOOM!! ${jugadorActual.nombre} ha perdido una vida.`);
 
-                    if (jugadorActual.vidas === 0) {
+                    if (jugadorActual.vidas <= 0) {
                         jugadorActual.vivo = false;
-                        io.to(sala).emit("evento-log", ` ${jugadorActual.nombre} ha sido eliminado.`);
+                        io.to(sala).emit("evento-log", ` ${jugadorActual.nombre} ha sido eliminado...`);
                     }
                     siguienteTurno(io, sala);
                 } else {
@@ -105,7 +106,7 @@ export const siguienteTurno = (io, sala) => {
         info.indiceTurno = (info.indiceTurno + 1) % info.jugadores.length;
     } while (!info.jugadores[info.indiceTurno].vivo && jugadoresVivos.length > 1);
 
-    // Se reinicia la sala...
+    // Se sigue el turno
     info.tiempo = 10;
     info.silaba = generarDosLetras();
     enviarInfoPublicaJugadores(io, sala); 
@@ -119,7 +120,7 @@ export const penalizarTiempo = (io, sala) => {
     enviarInfoPublicaJugadores(io, sala);
 };
 
-const detenerPartida = (io, sala, mensajeAviso = "") => {
+const detenerPartida = (io, sala) => {
     const info = objetoSalas[sala];
     if (!info) return;
 
@@ -139,6 +140,5 @@ const detenerPartida = (io, sala, mensajeAviso = "") => {
     info.jugadores[0].vivo = true;
 
     // Se envía la información al log y el estado.
-    io.to(sala).emit("evento-log", mensajeAviso);
     enviarInfoPublicaJugadores(io, sala);
 };
